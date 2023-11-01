@@ -1,0 +1,99 @@
+openapi: "3.0.0"
+info:
+  title: "API"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:3000"
+basePath: /public
+paths:
+  /register:
+    post:
+      summary: "Register"
+      operationId: "register"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /login:
+    post:
+      summary: "Login"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          x-go-type-skip-optional-pointer: true
+        password:
+          type: string
+          x-go-type-skip-optional-pointer: true
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          x-go-type-skip-optional-pointer: true
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          x-go-type-skip-optional-pointer: true
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+
