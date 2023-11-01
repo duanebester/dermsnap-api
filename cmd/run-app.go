@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"dermsnap/api"
+	"dermsnap/app"
 	"fmt"
 
 	"github.com/joho/godotenv"
@@ -16,16 +16,16 @@ func init() {
 }
 
 var runApiCmd = &cobra.Command{
-	Use:   "run-api",
-	Short: "Runs the dermsnap API",
-	Long:  `Runs the dermsnap API`,
+	Use:   "run-app",
+	Short: "Runs the dermsnap app",
+	Long:  `Runs the dermsnap app`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := godotenv.Load()
 		if err != nil {
 			panic("Error loading .env file")
 		}
 
-		app := api.NewApp()
+		app := app.NewApp()
 		app.Listen(fmt.Sprintf(":%s", Port))
 	},
 }
