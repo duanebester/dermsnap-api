@@ -19,12 +19,12 @@ import (
 )
 
 func NewApp() *fiber.App {
-	var appEnv = os.Getenv("APP_ENV")
-	var db = database.NewDatabase()
-	var services = services.NewServices(db)
-	var api = api.NewApi(services)
+	appEnv := os.Getenv("APP_ENV")
+	db := database.NewDatabase()
+	services := services.NewServices(db)
+	api := api.NewApi(services)
 
-	var engine = html.New("app/views", ".html")
+	engine := html.New("app/views", ".html")
 	if appEnv == "" || appEnv == "local" {
 		// Reload the templates on each render, good for development
 		engine.Reload(true)
@@ -32,7 +32,7 @@ func NewApp() *fiber.App {
 		engine.Debug(true)
 	}
 
-	var app = fiber.New(fiber.Config{
+	app := fiber.New(fiber.Config{
 		AppName:     "dermsnap",
 		Views:       engine,
 		ViewsLayout: "layouts/main",
@@ -43,14 +43,16 @@ func NewApp() *fiber.App {
 	app.Use(helmet.New())
 	app.Use(pprof.New())
 	app.Get("/metrics", monitor.New())
-	app.Static("/", "./assets")
+	app.Static("/", "/assets")
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{})
 	})
+	app.Get("/login/doximity", api.HandleLoginWithDoximity)
+	app.Get("/oauth2/doximity/callback", api.HandleOAuth2Callback)
 
-	var publicHandler = public.NewStrictHandler(api, nil)
-	var apiHandler = http.NewStrictHandler(api, nil)
+	publicHandler := public.NewStrictHandler(api, nil)
+	apiHandler := http.NewStrictHandler(api, nil)
 
 	publicRoute := app.Group("/public")
 	apiRoute := app.Group("/api", middleware.Protected())

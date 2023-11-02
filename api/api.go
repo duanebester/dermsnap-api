@@ -29,12 +29,12 @@ func NewApi(s *services.Services) API {
 	oidcConfig := &oidc.Config{ClientID: clientID}
 	verifier := provider.Verifier(oidcConfig)
 
-	redirectUrl := "https://api.dermsnap.io/oauth/doximity/callback"
+	redirectUrl := "https://api.dermsnap.io/oauth2/doximity/callback"
 	if appEnv == "" || appEnv == "local" {
-		redirectUrl = "http://localhost:3000/oauth/doximity/callback"
+		redirectUrl = "http://localhost:3000/oauth2/doximity/callback"
 	}
 	if appEnv == "development" {
-		redirectUrl = "https://dev-api.dermsnap.io/oauth/doximity/callback"
+		redirectUrl = "https://api-dev.dermsnap.io/oauth2/doximity/callback"
 	}
 
 	config := oauth2.Config{
@@ -42,7 +42,7 @@ func NewApi(s *services.Services) API {
 		ClientSecret: clientSecret,
 		Endpoint:     provider.Endpoint(),
 		RedirectURL:  redirectUrl,
-		Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
+		Scopes:       []string{oidc.ScopeOpenID},
 	}
 
 	return API{

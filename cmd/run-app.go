@@ -12,7 +12,7 @@ var Port string
 
 func init() {
 	rootCmd.AddCommand(runApiCmd)
-	runApiCmd.Flags().StringVarP(&Port, "port", "p", "3000", "Port to listen on")
+	runApiCmd.Flags().StringVarP(&Port, "port", "p", "8080", "Port to listen on")
 }
 
 var runApiCmd = &cobra.Command{
@@ -20,11 +20,7 @@ var runApiCmd = &cobra.Command{
 	Short: "Runs the dermsnap app",
 	Long:  `Runs the dermsnap app`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := godotenv.Load()
-		if err != nil {
-			panic("Error loading .env file")
-		}
-
+		_ = godotenv.Load()
 		app := app.NewApp()
 		app.Listen(fmt.Sprintf(":%s", Port))
 	},
