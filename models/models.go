@@ -6,6 +6,19 @@ import (
 	"github.com/google/uuid"
 )
 
+type UserIdentity struct {
+	ID       uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
+	Email    string    `json:"email" gorm:"unique"`
+	Password string    `json:"-"`
+}
+
+type DoctorIdentity struct {
+	ID          uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
+	DoxitimtyID string    `json:"doximity_id" gorm:"unique"`
+	Specialty   string    `json:"specialty"`
+	Credentials string    `json:"credentials"`
+}
+
 type Role string
 
 const (
@@ -15,10 +28,10 @@ const (
 )
 
 type User struct {
-	ID       uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
-	Email    string    `json:"email" gorm:"unique"`
-	Password string    `json:"-"`
-	Role     Role      `json:"role"`
+	ID             uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;"`
+	UserIdentity   UserIdentity   `json:"identity,inline"`
+	DoctorIdentity DoctorIdentity `json:"doctor_identity,inline"`
+	Role           Role           `json:"role"`
 }
 
 func NewUser(opts User) (*User, error) {

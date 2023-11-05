@@ -19,8 +19,11 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
 ARG DATABASE_URL
 ARG JWT_SECRET
+ARG DOXIMITY_CLIENT_ID
+ARG DOXIMITY_CLIENT_SECRET
+ARG DOXIMITY_PROVIDER_BASE_URL
+
 ENV APP_ENV="development"
-ENV DOXIMITY_PROVIDER_BASE_URL="https://auth.doximity.com"
 
 WORKDIR /
 

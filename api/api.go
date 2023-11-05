@@ -42,7 +42,7 @@ func NewApi(s *services.Services) API {
 		ClientSecret: clientSecret,
 		Endpoint:     provider.Endpoint(),
 		RedirectURL:  redirectUrl,
-		Scopes:       []string{oidc.ScopeOpenID},
+		Scopes:       []string{oidc.ScopeOpenID, "profile:read:email", "profile:read:basic"},
 	}
 
 	return API{

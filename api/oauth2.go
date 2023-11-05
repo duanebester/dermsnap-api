@@ -10,6 +10,7 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"golang.org/x/oauth2"
 )
 
 func SetCallbackCookie(w http.ResponseWriter, r *http.Request, name, value string) {
@@ -32,6 +33,10 @@ func (a API) HandleLoginWithDoximity(c *fiber.Ctx) error {
 	if err != nil {
 		panic(err)
 	}
+
+	// use PKCE to protect against CSRF attacks
+	verifier := oauth2.GenerateVerifier()
+
 	c.Cookie(&fiber.Cookie{
 		Name:     "state",
 		Value:    state,
@@ -46,18 +51,34 @@ func (a API) HandleLoginWithDoximity(c *fiber.Ctx) error {
 		HTTPOnly: true,
 		MaxAge:   int(time.Hour.Seconds()),
 	})
-	return c.Redirect(a.config.AuthCodeURL(state, oidc.Nonce(nonce)), fiber.StatusFound)
+	c.Cookie(&fiber.Cookie{
+		Name:     "verifier",
+		Value:    verifier,
+		Secure:   true,
+		HTTPOnly: true,
+		MaxAge:   int(time.Hour.Seconds()),
+	})
+
+	redirectUrl := a.config.AuthCodeURL(state, oauth2.AccessTypeOffline, oidc.Nonce(nonce), oauth2.S256ChallengeOption(verifier))
+	return c.Redirect(redirectUrl, fiber.StatusFound)
 }
 
 func (a API) HandleOAuth2Callback(c *fiber.Ctx) error {
 	ctx := c.Context()
 
-	state := c.Query("state")
-	if state == "" {
-		return errors.New("state is missing")
+	errorMessage := c.Query("error")
+	errorDescription := c.Query("error_description")
+	if errorMessage != "" {
+		log.Errorf("oauth2 error: %s - %s", errorMessage, errorDescription)
+		return fmt.Errorf("oauth2 error: %s - %s", errorMessage, errorDescription)
 	}
 
 	code := c.Query("code")
+	if code == "" {
+		return errors.New("code is missing")
+	}
+
+	state := c.Query("state")
 	if state == "" {
 		return errors.New("state is missing")
 	}
@@ -67,18 +88,17 @@ func (a API) HandleOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("state did not match")
 	}
 
-	errorMessage := c.Query("error")
-	errorDescription := c.Query("error_description")
-
-	if errorMessage != "" {
-		log.Errorf("oauth2 error: %s - %s", errorMessage, errorDescription)
-		return fmt.Errorf("oauth2 error: %s - %s", errorMessage, errorDescription)
+	codeVerifier := c.Cookies("verifier")
+	if codeVerifier == "" {
+		return errors.New("code verifier is missing")
 	}
 
-	oauth2Token, err := a.config.Exchange(ctx, code)
+	oauth2Token, err := a.config.Exchange(ctx, code, oauth2.VerifierOption(codeVerifier))
 	if err != nil {
 		return err
 	}
+
+	log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
@@ -86,20 +106,27 @@ func (a API) HandleOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("missing token")
 	}
 
+	log.Infof("rawIDToken: %s", rawIDToken)
+
 	// Parse and verify ID Token payload.
 	idToken, err := a.verifier.Verify(ctx, rawIDToken)
 	if err != nil {
 		return err
 	}
 
+	log.Info("ID Token: ", idToken)
+
 	// Extract custom claims
 	var claims struct {
-		Email    string `json:"email"`
-		Verified bool   `json:"email_verified"`
+		Specialty   string `json:"specialty"`
+		Credentials string `json:"credentials"`
 	}
 	if err := idToken.Claims(&claims); err != nil {
+		log.Errorf("failed to parse claims: %s", err)
 		return err
 	}
+
+	log.Infof("claims: %+v", claims)
 
 	return nil
 }
