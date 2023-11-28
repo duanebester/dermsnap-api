@@ -86,7 +86,7 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		return err
 	}
 
-	log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
+	// log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
@@ -94,7 +94,7 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("missing token")
 	}
 
-	log.Infof("rawIDToken: %s", rawIDToken)
+	// log.Infof("rawIDToken: %s", rawIDToken)
 
 	// Parse and verify ID Token payload.
 	idToken, err := a.doximityVerifier.Verify(ctx, rawIDToken)
@@ -102,7 +102,7 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		return err
 	}
 
-	log.Info("ID Token: ", idToken)
+	// log.Info("ID Token: ", idToken)
 
 	// Extract custom claims
 	var claims struct {
@@ -193,7 +193,7 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 		return err
 	}
 
-	log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
+	// log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
@@ -201,7 +201,7 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("missing token")
 	}
 
-	log.Infof("rawIDToken: %s", rawIDToken)
+	// log.Infof("rawIDToken: %s", rawIDToken)
 
 	// Parse and verify ID Token payload.
 	idToken, err := a.googleVerifier.Verify(ctx, rawIDToken)
@@ -209,19 +209,22 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 		return err
 	}
 
-	log.Info("ID Token: ", idToken)
+	// log.Info("ID Token: ", idToken)
 
 	// Extract custom claims
-	// var claims struct {
-	// 	Specialty   string `json:"specialty"`
-	// 	Credentials string `json:"credentials"`
-	// }
-	// if err := idToken.Claims(&claims); err != nil {
-	// 	log.Errorf("failed to parse claims: %s", err)
-	// 	return err
-	// }
+	var claims struct {
+		Email      string `json:"email"`
+		Name       string `json:"name"`
+		GivenName  string `json:"given_name"`
+		FamilyName string `json:"family_name"`
+		Picture    string `json:"picture"`
+	}
+	if err := idToken.Claims(&claims); err != nil {
+		log.Errorf("failed to parse claims: %s", err)
+		return err
+	}
 
-	// log.Infof("claims: %+v", claims)
+	log.Infof("claims: %+v", claims)
 
 	return c.SendString("ok")
 }
