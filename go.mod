@@ -8,7 +8,6 @@ require (
 	github.com/gofiber/contrib/jwt v1.0.7
 	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/gofiber/template/html/v2 v2.0.5
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.7.0
@@ -26,6 +25,7 @@ require (
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/gofiber/template v1.8.2 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect

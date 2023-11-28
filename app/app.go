@@ -49,7 +49,10 @@ func NewApp() *fiber.App {
 		return c.Render("index", fiber.Map{})
 	})
 	app.Get("/login/doximity", api.HandleLoginWithDoximity)
-	app.Get("/oauth2/doximity/callback", api.HandleOAuth2Callback)
+	app.Get("/oauth2/doximity/callback", api.HandleDoximityOAuth2Callback)
+
+	app.Get("/login/google", api.HandleLoginWithGoogle)
+	app.Get("/oauth2/google/callback", api.HandleGoogleOAuth2Callback)
 
 	publicHandler := public.NewStrictHandler(api, nil)
 	apiHandler := http.NewStrictHandler(api, nil)

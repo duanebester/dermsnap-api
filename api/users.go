@@ -8,13 +8,8 @@ import (
 )
 
 func (a API) Me(ctx context.Context, request http.MeRequestObject) (http.MeResponseObject, error) {
-	user, _ := models.NewUser(models.User{
-		Email:    "test@test.com",
-		Password: "test",
-		Role:     models.Client,
-	})
-
-	return http.Me200JSONResponse(*user), nil
+	user := models.NewUser("test@test.com", models.Client)
+	return http.Me200JSONResponse(user), nil
 }
 
 func (a API) Register(ctx context.Context, request public.RegisterRequestObject) (public.RegisterResponseObject, error) {
@@ -23,12 +18,7 @@ func (a API) Register(ctx context.Context, request public.RegisterRequestObject)
 		return public.Register500JSONResponse{}, err
 	}
 
-	token, err := a.services.AuthService.LoginUser(request.Body.Email, request.Body.Password)
-	if err != nil {
-		return public.Register500JSONResponse{}, err
-	}
-
 	return public.Register200JSONResponse{
-		Token: token,
+		Token: "abc",
 	}, nil
 }

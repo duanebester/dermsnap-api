@@ -1,22 +1,23 @@
 package models
 
 import (
-	"dermsnap/utils"
-
 	"github.com/google/uuid"
 )
 
-type UserIdentity struct {
-	ID       uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
-	Email    string    `json:"email" gorm:"unique"`
-	Password string    `json:"-"`
-}
+type IdentifierType string
 
-type DoctorIdentity struct {
-	ID          uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
-	DoxitimtyID string    `json:"doximity_id" gorm:"unique"`
-	Specialty   string    `json:"specialty"`
-	Credentials string    `json:"credentials"`
+const (
+	Email    IdentifierType = "email"
+	Doximity IdentifierType = "doximity"
+	Apple    IdentifierType = "apple"
+	Google   IdentifierType = "google"
+)
+
+type Identifier struct {
+	ID         uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;"`
+	UserID     uuid.UUID      `json:"user_id" gorm:"type:uuid;"`
+	Identifier string         `json:"identifier"`
+	Type       IdentifierType `json:"type"`
 }
 
 type Role string
@@ -28,21 +29,35 @@ const (
 )
 
 type User struct {
-	ID             uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;"`
-	UserIdentity   UserIdentity   `json:"identity,inline"`
-	DoctorIdentity DoctorIdentity `json:"doctor_identity,inline"`
-	Role           Role           `json:"role"`
+	ID       uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;"`
+	Identity Identifier `json:"identity,inline"`
+	Role     Role       `json:"role"`
 }
 
-func NewUser(opts User) (*User, error) {
-	hashedPassword, err := utils.HashPassword(opts.Password)
-	if err != nil {
-		return nil, err
+func NewUser(email string, role Role) User {
+	return User{
+		ID: uuid.New(),
+		Identity: Identifier{
+			ID:         uuid.New(),
+			Identifier: email,
+			Type:       Email,
+		},
+		Role: role,
 	}
-	return &User{
-		ID:       uuid.New(),
-		Email:    opts.Email,
-		Password: hashedPassword,
-		Role:     opts.Role,
-	}, nil
+}
+
+type UserInfo struct {
+	ID     uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
+	UserID uuid.UUID `json:"user_id" gorm:"type:uuid"`
+	Height int       `json:"height"`
+	Weight int       `json:"weight"`
+	Age    int       `json:"age"`
+	Gender string    `json:"gender"`
+}
+
+type DoctorInfo struct {
+	ID          uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
+	UserID      uuid.UUID `json:"user_id" gorm:"type:uuid"`
+	Specialty   string    `json:"specialty"`
+	Credentials string    `json:"credentials"`
 }

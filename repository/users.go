@@ -42,19 +42,10 @@ func (u UserRepositoryImpl) GetUserByEmail(email string) (*models.User, error) {
 
 // create user
 func (u UserRepositoryImpl) RegisterUser(email string, password string) (*models.User, error) {
-	user, err := models.NewUser(models.User{
-		Email:    email,
-		Password: password,
-		Role:     models.Client,
-	})
-
+	user := models.NewUser(email, models.Client)
+	err := u.db.Create(user).Error
 	if err != nil {
 		return nil, err
 	}
-
-	err = u.db.Create(user).Error
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return &user, nil
 }
