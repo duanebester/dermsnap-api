@@ -48,6 +48,10 @@ func NewApp() *fiber.App {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{})
 	})
+
+	app.Get("/login/apple", api.HandleLoginWithApple)
+	app.Post("/oauth2/apple/callback", api.HandleAppleOAuth2Callback)
+
 	app.Get("/login/doximity", api.HandleLoginWithDoximity)
 	app.Get("/oauth2/doximity/callback", api.HandleDoximityOAuth2Callback)
 
