@@ -5,13 +5,16 @@ import (
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func Protected() fiber.Handler {
-	jwtSecret := os.Getenv("JWT_SECRET")
 	return jwtware.New(jwtware.Config{
-		SigningKey:   jwtware.SigningKey{Key: []byte(jwtSecret)},
+		ContextKey:   "auth_token",
 		ErrorHandler: jwtError,
+		KeyFunc: func(t *jwt.Token) (interface{}, error) {
+			return []byte(os.Getenv("JWT_SECRET")), nil
+		},
 	})
 }
 

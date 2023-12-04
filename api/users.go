@@ -1,24 +1,17 @@
 package api
 
 import (
-	"context"
-	"dermsnap/api/http"
-	"dermsnap/api/public"
 	"dermsnap/models"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func (a API) Me(ctx context.Context, request http.MeRequestObject) (http.MeResponseObject, error) {
-	user := models.NewUser("test@test.com", models.Client)
-	return http.Me200JSONResponse(user), nil
-}
-
-func (a API) Register(ctx context.Context, request public.RegisterRequestObject) (public.RegisterResponseObject, error) {
-	_, err := a.services.UserService.RegisterUser(request.Body.Email, request.Body.Password)
-	if err != nil {
-		return public.Register500JSONResponse{}, err
+func (a API) Me(c *fiber.Ctx) error {
+	user := c.Locals("user").(*models.User)
+	if user == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(
+			fiber.Map{"message": "user not found"},
+		)
 	}
-
-	return public.Register200JSONResponse{
-		Token: "abc",
-	}, nil
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"user": user})
 }

@@ -9,10 +9,12 @@ import (
 )
 
 var Port string
+var SeedData bool
 
 func init() {
 	rootCmd.AddCommand(runApiCmd)
 	runApiCmd.Flags().StringVarP(&Port, "port", "p", "8080", "Port to listen on")
+	runApiCmd.Flags().BoolVarP(&SeedData, "seed", "s", false, "Seed the database with admin user")
 }
 
 var runApiCmd = &cobra.Command{
@@ -21,7 +23,7 @@ var runApiCmd = &cobra.Command{
 	Long:  `Runs the dermsnap app`,
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = godotenv.Load()
-		app := app.NewApp()
+		app := app.NewApp(SeedData)
 		app.Listen(fmt.Sprintf(":%s", Port))
 	},
 }

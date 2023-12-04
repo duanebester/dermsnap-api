@@ -7,18 +7,10 @@ import (
 type IdentifierType string
 
 const (
-	Email    IdentifierType = "email"
 	Doximity IdentifierType = "doximity"
 	Apple    IdentifierType = "apple"
 	Google   IdentifierType = "google"
 )
-
-type Identifier struct {
-	ID         uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;"`
-	UserID     uuid.UUID      `json:"user_id" gorm:"type:uuid;"`
-	Identifier string         `json:"identifier"`
-	Type       IdentifierType `json:"type"`
-}
 
 type Role string
 
@@ -29,20 +21,18 @@ const (
 )
 
 type User struct {
-	ID       uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;"`
-	Identity Identifier `json:"identity,inline"`
-	Role     Role       `json:"role"`
+	ID             uuid.UUID      `json:"id" gorm:"type:uuid;primary_key;"`
+	Role           Role           `json:"role"`
+	Identifier     string         `json:"identifier" gorm:"uniqueIndex:idx_identifier_type;not null;"`
+	IdentifierType IdentifierType `json:"identifier_type" gorm:"uniqueIndex:idx_identifier_type;not null;"`
 }
 
-func NewUser(email string, role Role) User {
+func NewUser(identifier string, role Role, idType IdentifierType) User {
 	return User{
-		ID: uuid.New(),
-		Identity: Identifier{
-			ID:         uuid.New(),
-			Identifier: email,
-			Type:       Email,
-		},
-		Role: role,
+		ID:             uuid.New(),
+		Role:           role,
+		Identifier:     identifier,
+		IdentifierType: idType,
 	}
 }
 
@@ -60,4 +50,13 @@ type DoctorInfo struct {
 	UserID      uuid.UUID `json:"user_id" gorm:"type:uuid"`
 	Specialty   string    `json:"specialty"`
 	Credentials string    `json:"credentials"`
+}
+
+func NewDoctorInfo(userID uuid.UUID, specialty, credentials string) DoctorInfo {
+	return DoctorInfo{
+		ID:          uuid.New(),
+		UserID:      userID,
+		Specialty:   specialty,
+		Credentials: credentials,
+	}
 }

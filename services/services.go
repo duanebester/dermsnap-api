@@ -5,11 +5,15 @@ import (
 )
 
 type Services struct {
-	UserService UserService
+	AuthService     AuthService
+	UserService     UserService
+	ProviderService ProviderService
 }
 
 func NewServices(db *gorm.DB) *Services {
 	return &Services{
-		UserService: NewUserService(db),
+		AuthService:     NewAuthService(db),
+		UserService:     NewUserService(db),
+		ProviderService: NewProviderService(),
 	}
 }

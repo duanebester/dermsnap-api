@@ -33,18 +33,6 @@ paths:
                 $ref: "#/components/schemas/Error"
 components:
   schemas:
-    Login:
-      type: object
-      properties:
-        email:
-          type: string
-        password:
-          type: string
-    LoginResponse:
-      type: object
-      properties:
-        token:
-          type: string
     User:
       x-go-type: models.User
       x-go-type-import:

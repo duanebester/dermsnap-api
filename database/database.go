@@ -19,6 +19,9 @@ func NewDatabase() *gorm.DB {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&models.User{}, &models.Identifier{}, &models.UserInfo{}, &models.DoctorInfo{})
+	err = db.AutoMigrate(&models.User{}, &models.UserInfo{}, &models.DoctorInfo{})
+	if err != nil {
+		panic("failed to migrate database")
+	}
 	return db
 }

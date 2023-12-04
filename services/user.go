@@ -4,13 +4,15 @@ import (
 	"dermsnap/models"
 	"dermsnap/repository"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type UserService interface {
 	GetUserByID(id string) (*models.User, error)
-	GetUserByEmail(email string) (*models.User, error)
-	RegisterUser(email string, password string) (*models.User, error)
+	GetUserByIdentifier(identifier string, idType models.IdentifierType) (*models.User, error)
+	CreateUser(identifier string, role models.Role, idType models.IdentifierType) (*models.User, error)
+	CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error)
 }
 
 type UserServiceImpl struct {
@@ -27,10 +29,14 @@ func (u UserServiceImpl) GetUserByID(id string) (*models.User, error) {
 	return u.userRepo.GetUserByID(id)
 }
 
-func (u UserServiceImpl) GetUserByEmail(email string) (*models.User, error) {
-	return u.userRepo.GetUserByEmail(email)
+func (u UserServiceImpl) CreateUser(identifier string, role models.Role, idType models.IdentifierType) (*models.User, error) {
+	return u.userRepo.CreateUser(identifier, role, idType)
 }
 
-func (u UserServiceImpl) RegisterUser(email string, password string) (*models.User, error) {
-	return u.userRepo.RegisterUser(email, password)
+func (u UserServiceImpl) GetUserByIdentifier(identifier string, idType models.IdentifierType) (*models.User, error) {
+	return u.userRepo.GetUserByIdentifier(identifier, idType)
+}
+
+func (u UserServiceImpl) CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error) {
+	return u.userRepo.CreateDoctorInfo(userID, specialty, credentials)
 }

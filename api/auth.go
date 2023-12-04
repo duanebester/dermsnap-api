@@ -1,11 +1,12 @@
 package api
 
 import (
-	"context"
-	"dermsnap/api/public"
+	"errors"
+
+	"github.com/gofiber/fiber/v2"
 )
 
-func (a API) Login(ctx context.Context, request public.LoginRequestObject) (public.LoginResponseObject, error) {
+func (a API) Login(c *fiber.Ctx) error {
 
-	return public.Login200JSONResponse{Token: "abc"}, nil
+	return errors.New("not implemented")
 }

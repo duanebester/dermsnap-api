@@ -1,6 +1,7 @@
 package api
 
 import (
+	"dermsnap/models"
 	"dermsnap/utils"
 	"errors"
 	"fmt"
@@ -53,7 +54,13 @@ func (a API) HandleLoginWithApple(c *fiber.Ctx) error {
 		SameSite: "None",
 	})
 
-	redirectUrl := a.appleConfig.AuthCodeURL(state, oauth2.AccessTypeOffline, oidc.Nonce(nonce), oauth2.S256ChallengeOption(verifier), oauth2.SetAuthURLParam("response_mode", "form_post"))
+	redirectUrl := a.services.ProviderService.AppleConfig.AuthCodeURL(
+		state,
+		oauth2.AccessTypeOffline,
+		oidc.Nonce(nonce),
+		oauth2.S256ChallengeOption(verifier),
+		oauth2.SetAuthURLParam("response_mode", "form_post"),
+	)
 	return c.Redirect(redirectUrl, fiber.StatusFound)
 }
 
@@ -90,7 +97,12 @@ func (a API) HandleAppleOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("code verifier is missing")
 	}
 
-	oauth2Token, err := a.appleConfig.Exchange(ctx, respBody.Code, oauth2.VerifierOption(codeVerifier))
+	// remove state from cookie
+	c.ClearCookie("apple-state")
+	c.ClearCookie("apple-nonce")
+	c.ClearCookie("apple-verifier")
+
+	oauth2Token, err := a.services.ProviderService.AppleConfig.Exchange(ctx, respBody.Code, oauth2.VerifierOption(codeVerifier))
 	if err != nil {
 		return err
 	}
@@ -101,7 +113,7 @@ func (a API) HandleAppleOAuth2Callback(c *fiber.Ctx) error {
 	}
 
 	// Parse and verify ID Token payload.
-	idToken, err := a.appleVerifier.Verify(ctx, rawIDToken)
+	idToken, err := a.services.ProviderService.AppleVerifier.Verify(ctx, rawIDToken)
 	if err != nil {
 		return err
 	}
@@ -117,7 +129,30 @@ func (a API) HandleAppleOAuth2Callback(c *fiber.Ctx) error {
 	}
 
 	log.Infof("claims: %+v", claims)
-	return c.SendString("ok")
+
+	_, err = a.services.UserService.CreateUser(claims.Email, models.Client, models.Apple)
+	if err != nil {
+		return err
+	}
+
+	token, err := a.services.AuthService.GenerateToken(claims.Email, models.Client, models.Apple)
+	if err != nil {
+		return err
+	}
+
+	// Set token in cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "dermsnap-auth",
+		Value:    token,
+		Secure:   true,
+		Domain:   "dermsnap.io",
+		MaxAge:   int(time.Hour.Seconds() * 72),
+		SameSite: "None",
+		HTTPOnly: true,
+		Expires:  time.Now().Add(time.Hour * 72),
+	})
+
+	return c.Redirect("https://dermsnap.io/", fiber.StatusFound)
 }
 
 func (a API) HandleLoginWithDoximity(c *fiber.Ctx) error {
@@ -161,7 +196,12 @@ func (a API) HandleLoginWithDoximity(c *fiber.Ctx) error {
 		SameSite: "None",
 	})
 
-	redirectUrl := a.doximityConfig.AuthCodeURL(state, oauth2.AccessTypeOffline, oidc.Nonce(nonce), oauth2.S256ChallengeOption(verifier))
+	redirectUrl := a.services.ProviderService.DoximityConfig.AuthCodeURL(
+		state,
+		oauth2.AccessTypeOffline,
+		oidc.Nonce(nonce),
+		oauth2.S256ChallengeOption(verifier),
+	)
 	return c.Redirect(redirectUrl, fiber.StatusFound)
 }
 
@@ -195,12 +235,15 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("code verifier is missing")
 	}
 
-	oauth2Token, err := a.doximityConfig.Exchange(ctx, code, oauth2.VerifierOption(codeVerifier))
+	// remove state from cookie
+	c.ClearCookie("doximity-state")
+	c.ClearCookie("doximity-nonce")
+	c.ClearCookie("doximity-verifier")
+
+	oauth2Token, err := a.services.ProviderService.DoximityConfig.Exchange(ctx, code, oauth2.VerifierOption(codeVerifier))
 	if err != nil {
 		return err
 	}
-
-	// log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
@@ -208,15 +251,11 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("missing token")
 	}
 
-	// log.Infof("rawIDToken: %s", rawIDToken)
-
 	// Parse and verify ID Token payload.
-	idToken, err := a.doximityVerifier.Verify(ctx, rawIDToken)
+	idToken, err := a.services.ProviderService.DoximityVerifier.Verify(ctx, rawIDToken)
 	if err != nil {
 		return err
 	}
-
-	// log.Info("ID Token: ", idToken)
 
 	// Extract custom claims
 	var claims struct {
@@ -230,7 +269,34 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 
 	log.Infof("claims: %+v", claims)
 
-	return c.SendString("ok")
+	doctor, err := a.services.UserService.CreateUser(idToken.Subject, models.Doctor, models.Doximity)
+	if err != nil {
+		return err
+	}
+
+	_, err = a.services.UserService.CreateDoctorInfo(doctor.ID, claims.Specialty, claims.Credentials)
+	if err != nil {
+		return err
+	}
+
+	token, err := a.services.AuthService.GenerateToken(idToken.Subject, models.Doctor, models.Doximity)
+	if err != nil {
+		return err
+	}
+
+	// Set token in cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "dermsnap-auth",
+		Value:    token,
+		Secure:   true,
+		Domain:   "dermsnap.io",
+		MaxAge:   int(time.Hour.Seconds() * 72),
+		SameSite: "None",
+		HTTPOnly: true,
+		Expires:  time.Now().Add(time.Hour * 72),
+	})
+
+	return c.Redirect("https://dermsnap.io/", fiber.StatusFound)
 }
 
 func (a API) HandleLoginWithGoogle(c *fiber.Ctx) error {
@@ -274,7 +340,12 @@ func (a API) HandleLoginWithGoogle(c *fiber.Ctx) error {
 		SameSite: "None",
 	})
 
-	redirectUrl := a.googleConfig.AuthCodeURL(state, oauth2.AccessTypeOffline, oidc.Nonce(nonce), oauth2.S256ChallengeOption(verifier))
+	redirectUrl := a.services.ProviderService.GoogleConfig.AuthCodeURL(
+		state,
+		oauth2.AccessTypeOffline,
+		oidc.Nonce(nonce),
+		oauth2.S256ChallengeOption(verifier),
+	)
 	return c.Redirect(redirectUrl, fiber.StatusFound)
 }
 
@@ -308,12 +379,15 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("code verifier is missing")
 	}
 
-	oauth2Token, err := a.googleConfig.Exchange(ctx, code, oauth2.VerifierOption(codeVerifier))
+	// remove state from cookie
+	c.ClearCookie("google-state")
+	c.ClearCookie("google-nonce")
+	c.ClearCookie("google-verifier")
+
+	oauth2Token, err := a.services.ProviderService.GoogleConfig.Exchange(ctx, code, oauth2.VerifierOption(codeVerifier))
 	if err != nil {
 		return err
 	}
-
-	// log.Infof("OAuth2 access_token: %s", oauth2Token.AccessToken)
 
 	// Extract the ID Token from OAuth2 token.
 	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
@@ -321,15 +395,11 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 		return errors.New("missing token")
 	}
 
-	// log.Infof("rawIDToken: %s", rawIDToken)
-
 	// Parse and verify ID Token payload.
-	idToken, err := a.googleVerifier.Verify(ctx, rawIDToken)
+	idToken, err := a.services.ProviderService.GoogleVerifier.Verify(ctx, rawIDToken)
 	if err != nil {
 		return err
 	}
-
-	// log.Info("ID Token: ", idToken)
 
 	// Extract custom claims
 	var claims struct {
@@ -346,5 +416,43 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 
 	log.Infof("claims: %+v", claims)
 
-	return c.SendString("ok")
+	found, err := a.services.UserService.GetUserByIdentifier(claims.Email, models.Google)
+	if err != nil {
+		if err.Error() != "record not found" {
+			log.Errorf("failed to find user: %s", err)
+			return err
+		}
+	}
+
+	if found == nil {
+		found, err := a.services.UserService.CreateUser(claims.Email, models.Client, models.Google)
+		if err != nil {
+			log.Errorf("failed to create user: %s", err)
+			return err
+		}
+
+		log.Infof("user created: %+v", found)
+	}
+
+	token, err := a.services.AuthService.GenerateToken(claims.Email, models.Client, models.Google)
+	if err != nil {
+		log.Errorf("failed to generate token: %s", err)
+		return err
+	}
+
+	log.Infof("token created: %+v", token)
+
+	// Set token in cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "dermsnap-auth",
+		Value:    token,
+		Secure:   true,
+		Domain:   "dermsnap.io",
+		MaxAge:   int(time.Hour.Seconds() * 72),
+		SameSite: "None",
+		HTTPOnly: true,
+		Expires:  time.Now().Add(time.Hour * 72),
+	})
+
+	return c.Redirect("https://dermsnap.io/", fiber.StatusFound)
 }
