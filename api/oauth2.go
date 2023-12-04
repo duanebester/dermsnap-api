@@ -152,7 +152,7 @@ func (a API) HandleAppleOAuth2Callback(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(time.Hour * 72),
 	})
 
-	return c.Redirect("https://dermsnap.io/", fiber.StatusFound)
+	return c.Redirect("https://api-dev.dermsnap.io/", fiber.StatusFound)
 }
 
 func (a API) HandleLoginWithDoximity(c *fiber.Ctx) error {
@@ -296,7 +296,7 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(time.Hour * 72),
 	})
 
-	return c.Redirect("https://dermsnap.io/", fiber.StatusFound)
+	return c.Redirect("https://api-dev.dermsnap.io/", fiber.StatusFound)
 }
 
 func (a API) HandleLoginWithGoogle(c *fiber.Ctx) error {
@@ -454,5 +454,5 @@ func (a API) HandleGoogleOAuth2Callback(c *fiber.Ctx) error {
 		Expires:  time.Now().Add(time.Hour * 72),
 	})
 
-	return c.Redirect("https://dermsnap.io/", fiber.StatusFound)
+	return c.Redirect("https://api-dev.dermsnap.io/", fiber.StatusFound)
 }
