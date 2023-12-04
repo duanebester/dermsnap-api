@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/testcontainers/testcontainers-go"
@@ -85,6 +86,46 @@ var _ = Describe("UserService", func() {
 			Expect(found).ToNot(BeNil())
 			Expect(found.ID).ToNot(BeNil())
 			Expect(found.Identifier).To(Equal("user2"))
+		})
+	})
+
+	Describe("GetUserById", func() {
+		var userID string
+		BeforeEach(func() {
+			user, err := UserService.CreateUser("user3", models.Admin, models.Google)
+			userID = user.ID.String()
+			Expect(err).To(BeNil())
+			Expect(user).ToNot(BeNil())
+			Expect(user.ID).ToNot(BeNil())
+			Expect(user.Identifier).To(Equal("user3"))
+		})
+		It("should get a user by id", func() {
+			found, err := UserService.GetUserByID(userID)
+			Expect(err).To(BeNil())
+			Expect(found).ToNot(BeNil())
+			Expect(found.ID).ToNot(BeNil())
+			Expect(found.Identifier).To(Equal("user3"))
+		})
+	})
+
+	Describe("CreateDoctorInfo", func() {
+		var doctorId uuid.UUID
+		BeforeEach(func() {
+			user, err := UserService.CreateUser("doctor1", models.Doctor, models.Doximity)
+			doctorId = user.ID
+			Expect(err).To(BeNil())
+			Expect(user).ToNot(BeNil())
+			Expect(user.ID).ToNot(BeNil())
+			Expect(user.Identifier).To(Equal("doctor1"))
+		})
+
+		It("should create a doctor info", func() {
+			doctorInfo, err := UserService.CreateDoctorInfo(doctorId, "Dermatology", "MD")
+			Expect(err).To(BeNil())
+			Expect(doctorInfo).ToNot(BeNil())
+			Expect(doctorInfo.ID).ToNot(BeNil())
+			Expect(doctorInfo.Specialty).To(Equal("Dermatology"))
+			Expect(doctorInfo.Credentials).To(Equal("MD"))
 		})
 	})
 })
