@@ -103,9 +103,8 @@ func NewApp(seedData bool) *fiber.App {
 
 		claims := t.Claims.(jwt.MapClaims)
 		userId := claims["user_id"].(string)
-		idType := claims["id_type"].(models.IdentifierType)
 
-		user, err := services.UserService.GetUserByIdentifier(userId, idType)
+		user, err := services.UserService.GetUserByID(userId)
 		if err != nil {
 			return c.Redirect("/login")
 		}
