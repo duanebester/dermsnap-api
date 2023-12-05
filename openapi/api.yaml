@@ -31,8 +31,84 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /users/{user_id}/user-info:
+    parameters:
+      - $ref: "#/components/parameters/user_id"
+    get:
+      summary: "Get user info"
+      operationId: "get-user-info"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: "Create user info"
+      operationId: "create-user-info"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserInfo"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
+    Role:
+      x-go-type: models.Role
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: string
+      enum:
+        - admin
+        - doctor
+        - user
+    IdentifierType:
+      x-go-type: models.IdentifierType
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: string
+      enum:
+        - apple
+        - doximity
+        - google
     User:
       x-go-type: models.User
       x-go-type-import:
@@ -41,19 +117,79 @@ components:
       type: object
       required:
         - id
-        - email
+        - role
+        - identifier
+        - identifier_type
       properties:
         id:
           type: string
           format: uuid
-        email:
+        role:
+          $ref: "#/components/schemas/Role"
+        identifier:
           type: string
-          format: email
+        identifier_type:
+          $ref: "#/components/schemas/IdentifierType"
+    UserInfo:
+      x-go-type: models.UserInfo
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - id
+        - user_id
+        - age
+        - height
+        - weight
+        - gender
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        allOf:
+          $ref: "#/components/schemas/CreateUserInfo"
+    CreateUserInfo:
+      x-go-type: models.CreateUserInfo
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - age
+        - height
+        - weight
+        - gender
+      properties:
+        age:
+          type: integer
+          format: int32
+        height:
+          type: integer
+          format: int32
+        weight:
+          type: integer
+          format: int32
+        gender:
+          type: string
+          format: string
     Error:
       type: object
       properties:
         message:
           type: string
+  parameters:
+    user_id:
+      name: user_id
+      description: The user ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
       type: http

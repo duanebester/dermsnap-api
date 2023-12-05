@@ -36,6 +36,13 @@ func NewUser(identifier string, role Role, idType IdentifierType) User {
 	}
 }
 
+type CreateUserInfo struct {
+	Height int    `json:"height"`
+	Weight int    `json:"weight"`
+	Age    int    `json:"age"`
+	Gender string `json:"gender"`
+}
+
 type UserInfo struct {
 	ID     uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
 	UserID uuid.UUID `json:"user_id" gorm:"type:uuid"`
@@ -43,6 +50,17 @@ type UserInfo struct {
 	Weight int       `json:"weight"`
 	Age    int       `json:"age"`
 	Gender string    `json:"gender"`
+}
+
+func NewUserInfo(userID uuid.UUID, age, height, weight int, gender string) UserInfo {
+	return UserInfo{
+		ID:     uuid.New(),
+		UserID: userID,
+		Height: height,
+		Weight: weight,
+		Age:    age,
+		Gender: gender,
+	}
 }
 
 type DoctorInfo struct {

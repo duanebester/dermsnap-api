@@ -7,6 +7,5 @@ import (
 )
 
 func (a API) Login(c *fiber.Ctx) error {
-
 	return errors.New("not implemented")
 }

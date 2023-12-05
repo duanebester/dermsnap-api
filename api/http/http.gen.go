@@ -16,25 +16,51 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/gofiber/fiber/v2"
+	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 const (
 	BearerAuthScopes = "bearerAuth.Scopes"
 )
 
+// CreateUserInfo defines model for CreateUserInfo.
+type CreateUserInfo = models.CreateUserInfo
+
 // Error defines model for Error.
 type Error struct {
 	Message *string `json:"message,omitempty"`
 }
 
+// IdentifierType defines model for IdentifierType.
+type IdentifierType = models.IdentifierType
+
+// Role defines model for Role.
+type Role = models.Role
+
 // User defines model for User.
 type User = models.User
+
+// UserInfo defines model for UserInfo.
+type UserInfo = models.UserInfo
+
+// UserId defines model for user_id.
+type UserId = openapi_types.UUID
+
+// CreateUserInfoJSONRequestBody defines body for CreateUserInfo for application/json ContentType.
+type CreateUserInfoJSONRequestBody = CreateUserInfo
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get current user
 	// (GET /me)
 	Me(c *fiber.Ctx) error
+	// Get user info
+	// (GET /users/{user_id}/user-info)
+	GetUserInfo(c *fiber.Ctx, userId UserId) error
+	// Create user info
+	// (POST /users/{user_id}/user-info)
+	CreateUserInfo(c *fiber.Ctx, userId UserId) error
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -50,6 +76,42 @@ func (siw *ServerInterfaceWrapper) Me(c *fiber.Ctx) error {
 	c.Context().SetUserValue(BearerAuthScopes, []string{})
 
 	return siw.Handler.Me(c)
+}
+
+// GetUserInfo operation middleware
+func (siw *ServerInterfaceWrapper) GetUserInfo(c *fiber.Ctx) error {
+
+	var err error
+
+	// ------------- Path parameter "user_id" -------------
+	var userId UserId
+
+	err = runtime.BindStyledParameter("simple", false, "user_id", c.Params("user_id"), &userId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter user_id: %w", err).Error())
+	}
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.GetUserInfo(c, userId)
+}
+
+// CreateUserInfo operation middleware
+func (siw *ServerInterfaceWrapper) CreateUserInfo(c *fiber.Ctx) error {
+
+	var err error
+
+	// ------------- Path parameter "user_id" -------------
+	var userId UserId
+
+	err = runtime.BindStyledParameter("simple", false, "user_id", c.Params("user_id"), &userId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter user_id: %w", err).Error())
+	}
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.CreateUserInfo(c, userId)
 }
 
 // FiberServerOptions provides options for the Fiber server.
@@ -75,19 +137,29 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 
 	router.Get(options.BaseURL+"/me", wrapper.Me)
 
+	router.Get(options.BaseURL+"/users/:user_id/user-info", wrapper.GetUserInfo)
+
+	router.Post(options.BaseURL+"/users/:user_id/user-info", wrapper.CreateUserInfo)
+
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/6xSTW/TQBD9K9HAcRO7FC576wFQQIhKpeIQ5bCxJ8lW3g9mZitC5f+OdtcmtJRbTx7P",
-	"13vz9j3AzjBeGzmChsZECwq64GLw6IVBPwB3R3SmhO+JAuUgUohIYrGkHTKbA+ZQThFBAwtZf4BxVHMm",
-	"7O6wExgV3DI+swOdsUMO9oGcEdBTRj1dqcD2j/pSsv2/baMCwh/JEvagN1Ba6sbtU04Kfi4PYTklXehx",
-	"4FVh+VdlaV0MJBnZG3duBAWxitcjOfYmNlNhzBwYu0RWTjdZxHrpDg0hXaU8NP99mI/59P0bqCp5xqjV",
-	"83VHkVgXW78PRXArQ65cXa9BwT0S2+BBw8WqXbVZrRDR52fVcFlSlW9h0rjyZgcsZ+XXMGKDX/eg4QtC",
-	"VpBj8Fx5v2nb/OmCF/RlwsQ42K7MNHecYWe35Og14R40vGrOdmomLzVF3XJHj9yRjVJZf/2cKb9tL14M",
-	"qVr2Gahbb5IcA9lf2GfQdy943n9B116QvBkWN0j3SIu58WwU0JvHFtlsx60CTs4ZOoGGjyiLLhGhl0X6",
-	"IyOXfVymEw2TVXTTDKEzwzGw6Mu2bWHcjr8DAAD//7RIV7fyAwAA",
+	"H4sIAAAAAAAC/+xWTW/jNhD9K8a0RzlSkvaiW/oVuEWRoEnQg2EEjDSWGEgkd0hl4zX03xdDyrYsO4mx",
+	"8QJ7yMmWyBm+efP4Rkt4EBavhSshhVgYCRFkujZaoXIW0iUYQaJGh+SfGot0L3P+m6PNSBontYIUbksc",
+	"8eJo8gdEIPmV4awRKFEjpOvICAg/NZIwh9RRgxHYrMRacMq5plo43tz4nW5hONQ6kqqAtm1Xmz2W3wmF",
+	"wzuLNFFz7bGSNkhOol8XBW4llcqdn22ySuWwQII2ggJVjrS1uTtzB0MEJcqidAdm/nz45rbPzNSjXx+2",
+	"TrTGOlsn0A+PmPHK87jQ4+5lrXOs7MmAot6esayNJo+sa1AIgSj0LYUcqbZKmLhbYIB/EmnaZbpGazu2",
+	"hy0bwmwjmOSonJxLpFu/tARUTe1rNqbiqnP9LGvpFlyu1kWFvXLXjdlT7iDzu8v9T1fb+PJaKo8vc5og",
+	"8qI+EJvP9W5E3Mpd/sOFfOP2RCDX9OzpVH/53nWN+ZlwDin8FG88Ie5uYDwgm+Xb0fValKdhqPVgC4Gg",
+	"HshdSIep3pN0FKpfMJaqupq/Vejg6nl+D+pSz2Lf8sM9LG5s9igGcizrYOfGrCHpFjdMUCDyAQUhXTQc",
+	"tHr6a1Xz3//fQuf3fEZY3ZBQOmdCYtk1yUnH+oOL6wlE8IRkw2g6PUlOEmZWG1Q84lI4968CXo8krr1y",
+	"C/RlcbMFD7ZJDin8i35oWaOVDbjPkoR/Mq0cKh/BziUzHxM/Wj522Ztrr+nEi9XXsT1Qr/5hyL8kp0c7",
+	"KZj3nqPulGhcqUl+wZwP/fWI5b146EQ5JCWq0Q3SE9JotXEjFEin2xKZztpZBLapa0ELSOES3ShriFA5",
+	"/+3ho2P+Z+NldxFa/zxeaWRvgy/R9XT+XTsdvOCj29/Ybf+FKTs/7X+ZTvfj2myJV8bISY22e2Sw87HE",
+	"5orW/abzxdEYGo6FNrj4h+R+RMmFZvVVF8I5XxBdQ1U3i9I4rnQmqlJbl54nSQLtrP0aAAD//9VVpqpf",
+	"DQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

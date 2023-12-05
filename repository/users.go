@@ -12,6 +12,8 @@ type UserRepository interface {
 	GetUserByIdentifier(identifier string, idType models.IdentifierType) (*models.User, error)
 	CreateUser(identifier string, role models.Role, idType models.IdentifierType) (*models.User, error)
 	CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error)
+	GetUserInfo(userID uuid.UUID) (*models.UserInfo, error)
+	CreateUserInfo(userID uuid.UUID, opts models.CreateUserInfo) (*models.UserInfo, error)
 }
 
 type UserRepositoryImpl struct {
@@ -60,4 +62,22 @@ func (u UserRepositoryImpl) CreateDoctorInfo(userID uuid.UUID, specialty string,
 		return nil, err
 	}
 	return &doctorInfo, nil
+}
+
+func (u UserRepositoryImpl) GetUserInfo(userID uuid.UUID) (*models.UserInfo, error) {
+	var userInfo models.UserInfo
+	err := u.db.Where("user_id = ?", userID).Find(&userInfo).Error
+	if err != nil {
+		return nil, err
+	}
+	return &userInfo, nil
+}
+
+func (u UserRepositoryImpl) CreateUserInfo(userID uuid.UUID, opts models.CreateUserInfo) (*models.UserInfo, error) {
+	userInfo := models.NewUserInfo(userID, opts.Age, opts.Height, opts.Weight, opts.Gender)
+	err := u.db.Create(userInfo).Error
+	if err != nil {
+		return nil, err
+	}
+	return &userInfo, nil
 }

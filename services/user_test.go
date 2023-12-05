@@ -128,4 +128,40 @@ var _ = Describe("UserService", func() {
 			Expect(doctorInfo.Credentials).To(Equal("MD"))
 		})
 	})
+
+	Describe("CreateUserInfo", Ordered, func() {
+		var userId uuid.UUID
+		BeforeAll(func() {
+			user, err := UserService.CreateUser("user4", models.Doctor, models.Doximity)
+			userId = user.ID
+			Expect(err).To(BeNil())
+			Expect(user).ToNot(BeNil())
+			Expect(user.ID).ToNot(BeNil())
+			Expect(user.Identifier).To(Equal("user4"))
+		})
+
+		It("should create a user info", func() {
+			userInfo, err := UserService.CreateUserInfo(userId, models.CreateUserInfo{
+				Height: 180,
+				Weight: 80,
+				Age:    30,
+				Gender: "male",
+			})
+			Expect(err).To(BeNil())
+			Expect(userInfo).ToNot(BeNil())
+			Expect(userInfo.ID).ToNot(BeNil())
+			Expect(userInfo.Weight).To(Equal(80))
+			Expect(userInfo.Gender).To(Equal("male"))
+		})
+
+		It("should get user info", func() {
+			userInfo, err := UserService.GetUserInfo(userId)
+			Expect(err).To(BeNil())
+			Expect(userInfo).ToNot(BeNil())
+			Expect(userInfo.ID).ToNot(BeNil())
+			Expect(userInfo.UserID).To(Equal(userId))
+			Expect(userInfo.Weight).To(Equal(80))
+			Expect(userInfo.Gender).To(Equal("male"))
+		})
+	})
 })
