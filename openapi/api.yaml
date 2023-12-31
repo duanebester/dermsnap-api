@@ -87,6 +87,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /users/{user_id}/doctor-info:
+    parameters:
+      - $ref: "#/components/parameters/user_id"
+    get:
+      summary: "Get doctor info"
+      operationId: "get-doctor-info"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorInfo"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: "Create doctor info"
+      operationId: "create-doctor-info"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDoctorInfo"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorInfo"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Role:
@@ -152,6 +208,28 @@ components:
           format: uuid
         allOf:
           $ref: "#/components/schemas/CreateUserInfo"
+    DoctorInfo:
+      x-go-type: models.DoctorInfo
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - id
+        - user_id
+        - specialty
+        - credentials
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        specialty:
+          type: string
+        credentials:
+          type: string
     CreateUserInfo:
       x-go-type: models.CreateUserInfo
       x-go-type-import:
@@ -176,8 +254,24 @@ components:
         gender:
           type: string
           format: string
+    CreateDoctorInfo:
+      x-go-type: models.CreateDoctorInfo
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - specialty
+        - credentials
+      properties:
+        specialty:
+          type: string
+        credentials:
+          type: string
     Error:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string

@@ -274,7 +274,10 @@ func (a API) HandleDoximityOAuth2Callback(c *fiber.Ctx) error {
 		return err
 	}
 
-	_, err = a.services.UserService.CreateDoctorInfo(doctor.ID, claims.Specialty, claims.Credentials)
+	_, err = a.services.UserService.CreateDoctorInfo(doctor.ID, models.CreateDoctorInfo{
+		Specialty:   claims.Specialty,
+		Credentials: claims.Credentials,
+	})
 	if err != nil {
 		return err
 	}

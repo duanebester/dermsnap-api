@@ -120,7 +120,10 @@ var _ = Describe("UserService", func() {
 		})
 
 		It("should create a doctor info", func() {
-			doctorInfo, err := UserService.CreateDoctorInfo(doctorId, "Dermatology", "MD")
+			doctorInfo, err := UserService.CreateDoctorInfo(doctorId, models.CreateDoctorInfo{
+				Specialty:   "Dermatology",
+				Credentials: "MD",
+			})
 			Expect(err).To(BeNil())
 			Expect(doctorInfo).ToNot(BeNil())
 			Expect(doctorInfo.ID).ToNot(BeNil())

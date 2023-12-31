@@ -130,8 +130,8 @@ func NewApp(seedData bool) *fiber.App {
 	publicRoute := app.Group("/public")
 	apiRoute := app.Group("/api", middleware.Protected(), middleware.EnrichUser(services.UserService))
 
-	public.RegisterHandlers(publicRoute, api)
-	http.RegisterHandlers(apiRoute, api)
+	public.RegisterHandlers(publicRoute, public.NewStrictHandler(api, nil))
+	http.RegisterHandlers(apiRoute, http.NewStrictHandler(api, nil))
 
 	return app
 }

@@ -11,8 +11,9 @@ type UserRepository interface {
 	GetUserByID(id string) (*models.User, error)
 	GetUserByIdentifier(identifier string, idType models.IdentifierType) (*models.User, error)
 	CreateUser(identifier string, role models.Role, idType models.IdentifierType) (*models.User, error)
-	CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error)
+	CreateDoctorInfo(userID uuid.UUID, opts models.CreateDoctorInfo) (*models.DoctorInfo, error)
 	GetUserInfo(userID uuid.UUID) (*models.UserInfo, error)
+	GetDoctorInfo(userID uuid.UUID) (*models.DoctorInfo, error)
 	CreateUserInfo(userID uuid.UUID, opts models.CreateUserInfo) (*models.UserInfo, error)
 }
 
@@ -55,8 +56,8 @@ func (u UserRepositoryImpl) CreateUser(identifier string, role models.Role, idTy
 }
 
 // create doctor info
-func (u UserRepositoryImpl) CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error) {
-	doctorInfo := models.NewDoctorInfo(userID, specialty, credentials)
+func (u UserRepositoryImpl) CreateDoctorInfo(userID uuid.UUID, opts models.CreateDoctorInfo) (*models.DoctorInfo, error) {
+	doctorInfo := models.NewDoctorInfo(userID, opts.Specialty, opts.Credentials)
 	err := u.db.Create(doctorInfo).Error
 	if err != nil {
 		return nil, err
@@ -66,11 +67,20 @@ func (u UserRepositoryImpl) CreateDoctorInfo(userID uuid.UUID, specialty string,
 
 func (u UserRepositoryImpl) GetUserInfo(userID uuid.UUID) (*models.UserInfo, error) {
 	var userInfo models.UserInfo
-	err := u.db.Where("user_id = ?", userID).Find(&userInfo).Error
+	err := u.db.Where("user_id = ?", userID).First(&userInfo).Error
 	if err != nil {
 		return nil, err
 	}
 	return &userInfo, nil
+}
+
+func (u UserRepositoryImpl) GetDoctorInfo(userID uuid.UUID) (*models.DoctorInfo, error) {
+	var doctorInfo models.DoctorInfo
+	err := u.db.Where("user_id = ?", userID).First(&doctorInfo).Error
+	if err != nil {
+		return nil, err
+	}
+	return &doctorInfo, nil
 }
 
 func (u UserRepositoryImpl) CreateUserInfo(userID uuid.UUID, opts models.CreateUserInfo) (*models.UserInfo, error) {

@@ -13,8 +13,9 @@ type UserService interface {
 	GetUserByIdentifier(identifier string, idType models.IdentifierType) (*models.User, error)
 	CreateUser(identifier string, role models.Role, idType models.IdentifierType) (*models.User, error)
 	GetUserInfo(userID uuid.UUID) (*models.UserInfo, error)
+	GetDoctorInfo(userID uuid.UUID) (*models.DoctorInfo, error)
 	CreateUserInfo(userID uuid.UUID, opts models.CreateUserInfo) (*models.UserInfo, error)
-	CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error)
+	CreateDoctorInfo(userID uuid.UUID, opts models.CreateDoctorInfo) (*models.DoctorInfo, error)
 }
 
 type UserServiceImpl struct {
@@ -39,8 +40,12 @@ func (u UserServiceImpl) GetUserByIdentifier(identifier string, idType models.Id
 	return u.userRepo.GetUserByIdentifier(identifier, idType)
 }
 
-func (u UserServiceImpl) CreateDoctorInfo(userID uuid.UUID, specialty string, credentials string) (*models.DoctorInfo, error) {
-	return u.userRepo.CreateDoctorInfo(userID, specialty, credentials)
+func (u UserServiceImpl) CreateDoctorInfo(userID uuid.UUID, opts models.CreateDoctorInfo) (*models.DoctorInfo, error) {
+	return u.userRepo.CreateDoctorInfo(userID, opts)
+}
+
+func (u UserServiceImpl) GetDoctorInfo(userID uuid.UUID) (*models.DoctorInfo, error) {
+	return u.userRepo.GetDoctorInfo(userID)
 }
 
 func (u UserServiceImpl) GetUserInfo(userID uuid.UUID) (*models.UserInfo, error) {

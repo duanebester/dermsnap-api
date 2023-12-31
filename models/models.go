@@ -45,7 +45,7 @@ type CreateUserInfo struct {
 
 type UserInfo struct {
 	ID     uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
-	UserID uuid.UUID `json:"user_id" gorm:"type:uuid"`
+	UserID uuid.UUID `json:"user_id" gorm:"type:uuid;index:idx_user_id,unique"`
 	Height int       `json:"height"`
 	Weight int       `json:"weight"`
 	Age    int       `json:"age"`
@@ -61,6 +61,11 @@ func NewUserInfo(userID uuid.UUID, age, height, weight int, gender string) UserI
 		Age:    age,
 		Gender: gender,
 	}
+}
+
+type CreateDoctorInfo struct {
+	Specialty   string `json:"specialty"`
+	Credentials string `json:"credentials"`
 }
 
 type DoctorInfo struct {
