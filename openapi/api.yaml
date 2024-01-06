@@ -31,6 +31,174 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /dermsnaps:
+    get:
+      summary: "Get dermsnaps"
+      operationId: "get-dermsnaps"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dermsnap"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: "Create dermsnap"
+      operationId: "create-dermsnap"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDermsnap"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dermsnap"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /dermsnaps/{dermsnap_id}:
+    parameters:
+      - $ref: "#/components/parameters/dermsnap_id"
+    get:
+      summary: "Get dermsnap"
+      operationId: "get-dermsnap-by-id"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDermsnap"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dermsnap"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: "Update dermsnap"
+      operationId: "update-dermsnap-by-id"
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDermsnap"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dermsnap"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: "Delete dermsnap"
+      operationId: "delete-dermsnap-by-id"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Delete Dermsnap"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dermsnap"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /dermsnaps/{dermsnap_id}/images:
+    parameters:
+      - $ref: "#/components/parameters/dermsnap_id"
+    post:
+      summary: "Upload dermsnap image"
+      operationId: "upload-dermsnap-image"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DermsnapImage"
+        "401":
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /users/{user_id}/user-info:
     parameters:
       - $ref: "#/components/parameters/user_id"
@@ -268,6 +436,129 @@ components:
           type: string
         credentials:
           type: string
+    BodyLocation:
+      x-go-type: models.BodyLocation
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: string
+      enum:
+        - scalp
+        - face
+        - eyes
+        - mouth
+        - neck
+        - chest
+        - abdomen
+        - back
+        - arms
+        - hands
+        - buttocks
+        - genitals
+        - legs
+        - feet
+    DermsnapImage:
+      x-go-type: models.DermsnapImage
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - image_path
+      properties:
+        id:
+          type: string
+          format: uuid
+        dermsnap_id:
+          type: string
+          format: uuid
+        image_path:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    Dermsnap:
+      x-go-type: models.Dermsnap
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - id
+        - user_id
+        - reviewed
+        - start_time
+        - duration
+        - locations
+        - changed
+        - new_medications
+        - itchy
+        - painful
+        - more_info
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        reviewed:
+          type: boolean
+        reviewed_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        allOf:
+          $ref: "#/components/schemas/CreateDermsnap"
+    CreateDermsnap:
+      x-go-type: models.CreateDermsnap
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      required:
+        - start_time
+        - duration
+        - locations
+        - changed
+        - new_medications
+        - itchy
+        - painful
+        - more_info
+      properties:
+        allOf:
+          $ref: "#/components/schemas/UpdateDermsnap"
+    UpdateDermsnap:
+      x-go-type: models.UpdateDermsnap
+      x-go-type-import:
+        name: models
+        path: dermsnap/models
+      type: object
+      properties:
+        start_time:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          format: int32
+        locations:
+          items:
+            $ref: "#/components/schemas/BodyLocation"
+          type: array
+        changed:
+          type: boolean
+        new_medications:
+          items:
+            type: string
+          type: array
+        itchy:
+          type: boolean
+        painful:
+          type: boolean
+        more_info:
+          type: string
     Error:
       type: object
       required:
@@ -279,6 +570,14 @@ components:
     user_id:
       name: user_id
       description: The user ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    dermsnap_id:
+      name: dermsnap_id
+      description: The dermsnap ID
       in: path
       required: true
       schema:

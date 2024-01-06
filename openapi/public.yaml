@@ -59,10 +59,11 @@ components:
           x-go-type-skip-optional-pointer: true
     Error:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string
-          x-go-type-skip-optional-pointer: true
   securitySchemes:
     bearerAuth:            # arbitrary name for the security scheme
       type: http

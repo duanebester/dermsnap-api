@@ -25,11 +25,23 @@ const (
 	BearerAuthScopes = "bearerAuth.Scopes"
 )
 
+// BodyLocation defines model for BodyLocation.
+type BodyLocation = models.BodyLocation
+
+// CreateDermsnap defines model for CreateDermsnap.
+type CreateDermsnap = models.CreateDermsnap
+
 // CreateDoctorInfo defines model for CreateDoctorInfo.
 type CreateDoctorInfo = models.CreateDoctorInfo
 
 // CreateUserInfo defines model for CreateUserInfo.
 type CreateUserInfo = models.CreateUserInfo
+
+// Dermsnap defines model for Dermsnap.
+type Dermsnap = models.Dermsnap
+
+// DermsnapImage defines model for DermsnapImage.
+type DermsnapImage = models.DermsnapImage
 
 // DoctorInfo defines model for DoctorInfo.
 type DoctorInfo = models.DoctorInfo
@@ -45,14 +57,29 @@ type IdentifierType = models.IdentifierType
 // Role defines model for Role.
 type Role = models.Role
 
+// UpdateDermsnap defines model for UpdateDermsnap.
+type UpdateDermsnap = models.UpdateDermsnap
+
 // User defines model for User.
 type User = models.User
 
 // UserInfo defines model for UserInfo.
 type UserInfo = models.UserInfo
 
+// DermsnapId defines model for dermsnap_id.
+type DermsnapId = openapi_types.UUID
+
 // UserId defines model for user_id.
 type UserId = openapi_types.UUID
+
+// CreateDermsnapJSONRequestBody defines body for CreateDermsnap for application/json ContentType.
+type CreateDermsnapJSONRequestBody = CreateDermsnap
+
+// GetDermsnapByIdJSONRequestBody defines body for GetDermsnapById for application/json ContentType.
+type GetDermsnapByIdJSONRequestBody = UpdateDermsnap
+
+// UpdateDermsnapByIdJSONRequestBody defines body for UpdateDermsnapById for application/json ContentType.
+type UpdateDermsnapByIdJSONRequestBody = UpdateDermsnap
 
 // CreateDoctorInfoJSONRequestBody defines body for CreateDoctorInfo for application/json ContentType.
 type CreateDoctorInfoJSONRequestBody = CreateDoctorInfo
@@ -62,6 +89,24 @@ type CreateUserInfoJSONRequestBody = CreateUserInfo
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Get dermsnaps
+	// (GET /dermsnaps)
+	GetDermsnaps(c *fiber.Ctx) error
+	// Create dermsnap
+	// (POST /dermsnaps)
+	CreateDermsnap(c *fiber.Ctx) error
+	// Delete dermsnap
+	// (DELETE /dermsnaps/{dermsnap_id})
+	DeleteDermsnapById(c *fiber.Ctx, dermsnapId DermsnapId) error
+	// Get dermsnap
+	// (GET /dermsnaps/{dermsnap_id})
+	GetDermsnapById(c *fiber.Ctx, dermsnapId DermsnapId) error
+	// Update dermsnap
+	// (PUT /dermsnaps/{dermsnap_id})
+	UpdateDermsnapById(c *fiber.Ctx, dermsnapId DermsnapId) error
+	// Upload dermsnap image
+	// (POST /dermsnaps/{dermsnap_id}/images)
+	UploadDermsnapImage(c *fiber.Ctx, dermsnapId DermsnapId) error
 	// Get current user
 	// (GET /me)
 	Me(c *fiber.Ctx) error
@@ -85,6 +130,94 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc fiber.Handler
+
+// GetDermsnaps operation middleware
+func (siw *ServerInterfaceWrapper) GetDermsnaps(c *fiber.Ctx) error {
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.GetDermsnaps(c)
+}
+
+// CreateDermsnap operation middleware
+func (siw *ServerInterfaceWrapper) CreateDermsnap(c *fiber.Ctx) error {
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.CreateDermsnap(c)
+}
+
+// DeleteDermsnapById operation middleware
+func (siw *ServerInterfaceWrapper) DeleteDermsnapById(c *fiber.Ctx) error {
+
+	var err error
+
+	// ------------- Path parameter "dermsnap_id" -------------
+	var dermsnapId DermsnapId
+
+	err = runtime.BindStyledParameter("simple", false, "dermsnap_id", c.Params("dermsnap_id"), &dermsnapId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter dermsnap_id: %w", err).Error())
+	}
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.DeleteDermsnapById(c, dermsnapId)
+}
+
+// GetDermsnapById operation middleware
+func (siw *ServerInterfaceWrapper) GetDermsnapById(c *fiber.Ctx) error {
+
+	var err error
+
+	// ------------- Path parameter "dermsnap_id" -------------
+	var dermsnapId DermsnapId
+
+	err = runtime.BindStyledParameter("simple", false, "dermsnap_id", c.Params("dermsnap_id"), &dermsnapId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter dermsnap_id: %w", err).Error())
+	}
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.GetDermsnapById(c, dermsnapId)
+}
+
+// UpdateDermsnapById operation middleware
+func (siw *ServerInterfaceWrapper) UpdateDermsnapById(c *fiber.Ctx) error {
+
+	var err error
+
+	// ------------- Path parameter "dermsnap_id" -------------
+	var dermsnapId DermsnapId
+
+	err = runtime.BindStyledParameter("simple", false, "dermsnap_id", c.Params("dermsnap_id"), &dermsnapId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter dermsnap_id: %w", err).Error())
+	}
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.UpdateDermsnapById(c, dermsnapId)
+}
+
+// UploadDermsnapImage operation middleware
+func (siw *ServerInterfaceWrapper) UploadDermsnapImage(c *fiber.Ctx) error {
+
+	var err error
+
+	// ------------- Path parameter "dermsnap_id" -------------
+	var dermsnapId DermsnapId
+
+	err = runtime.BindStyledParameter("simple", false, "dermsnap_id", c.Params("dermsnap_id"), &dermsnapId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter dermsnap_id: %w", err).Error())
+	}
+
+	c.Context().SetUserValue(BearerAuthScopes, []string{})
+
+	return siw.Handler.UploadDermsnapImage(c, dermsnapId)
+}
 
 // Me operation middleware
 func (siw *ServerInterfaceWrapper) Me(c *fiber.Ctx) error {
@@ -187,6 +320,18 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 		router.Use(m)
 	}
 
+	router.Get(options.BaseURL+"/dermsnaps", wrapper.GetDermsnaps)
+
+	router.Post(options.BaseURL+"/dermsnaps", wrapper.CreateDermsnap)
+
+	router.Delete(options.BaseURL+"/dermsnaps/:dermsnap_id", wrapper.DeleteDermsnapById)
+
+	router.Get(options.BaseURL+"/dermsnaps/:dermsnap_id", wrapper.GetDermsnapById)
+
+	router.Put(options.BaseURL+"/dermsnaps/:dermsnap_id", wrapper.UpdateDermsnapById)
+
+	router.Post(options.BaseURL+"/dermsnaps/:dermsnap_id/images", wrapper.UploadDermsnapImage)
+
 	router.Get(options.BaseURL+"/me", wrapper.Me)
 
 	router.Get(options.BaseURL+"/users/:user_id/doctor-info", wrapper.GetDoctorInfo)
@@ -197,6 +342,217 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 
 	router.Post(options.BaseURL+"/users/:user_id/user-info", wrapper.CreateUserInfo)
 
+}
+
+type GetDermsnapsRequestObject struct {
+}
+
+type GetDermsnapsResponseObject interface {
+	VisitGetDermsnapsResponse(ctx *fiber.Ctx) error
+}
+
+type GetDermsnaps200JSONResponse []Dermsnap
+
+func (response GetDermsnaps200JSONResponse) VisitGetDermsnapsResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(200)
+
+	return ctx.JSON(&response)
+}
+
+type GetDermsnaps401JSONResponse Error
+
+func (response GetDermsnaps401JSONResponse) VisitGetDermsnapsResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type GetDermsnaps500JSONResponse Error
+
+func (response GetDermsnaps500JSONResponse) VisitGetDermsnapsResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(500)
+
+	return ctx.JSON(&response)
+}
+
+type CreateDermsnapRequestObject struct {
+	Body *CreateDermsnapJSONRequestBody
+}
+
+type CreateDermsnapResponseObject interface {
+	VisitCreateDermsnapResponse(ctx *fiber.Ctx) error
+}
+
+type CreateDermsnap200JSONResponse Dermsnap
+
+func (response CreateDermsnap200JSONResponse) VisitCreateDermsnapResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(200)
+
+	return ctx.JSON(&response)
+}
+
+type CreateDermsnap401JSONResponse Error
+
+func (response CreateDermsnap401JSONResponse) VisitCreateDermsnapResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type CreateDermsnap500JSONResponse Error
+
+func (response CreateDermsnap500JSONResponse) VisitCreateDermsnapResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(500)
+
+	return ctx.JSON(&response)
+}
+
+type DeleteDermsnapByIdRequestObject struct {
+	DermsnapId DermsnapId `json:"dermsnap_id"`
+}
+
+type DeleteDermsnapByIdResponseObject interface {
+	VisitDeleteDermsnapByIdResponse(ctx *fiber.Ctx) error
+}
+
+type DeleteDermsnapById200JSONResponse Dermsnap
+
+func (response DeleteDermsnapById200JSONResponse) VisitDeleteDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(200)
+
+	return ctx.JSON(&response)
+}
+
+type DeleteDermsnapById401JSONResponse Error
+
+func (response DeleteDermsnapById401JSONResponse) VisitDeleteDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type DeleteDermsnapById500JSONResponse Error
+
+func (response DeleteDermsnapById500JSONResponse) VisitDeleteDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(500)
+
+	return ctx.JSON(&response)
+}
+
+type GetDermsnapByIdRequestObject struct {
+	DermsnapId DermsnapId `json:"dermsnap_id"`
+	Body       *GetDermsnapByIdJSONRequestBody
+}
+
+type GetDermsnapByIdResponseObject interface {
+	VisitGetDermsnapByIdResponse(ctx *fiber.Ctx) error
+}
+
+type GetDermsnapById200JSONResponse Dermsnap
+
+func (response GetDermsnapById200JSONResponse) VisitGetDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(200)
+
+	return ctx.JSON(&response)
+}
+
+type GetDermsnapById401JSONResponse Error
+
+func (response GetDermsnapById401JSONResponse) VisitGetDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type GetDermsnapById500JSONResponse Error
+
+func (response GetDermsnapById500JSONResponse) VisitGetDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(500)
+
+	return ctx.JSON(&response)
+}
+
+type UpdateDermsnapByIdRequestObject struct {
+	DermsnapId DermsnapId `json:"dermsnap_id"`
+	Body       *UpdateDermsnapByIdJSONRequestBody
+}
+
+type UpdateDermsnapByIdResponseObject interface {
+	VisitUpdateDermsnapByIdResponse(ctx *fiber.Ctx) error
+}
+
+type UpdateDermsnapById200JSONResponse Dermsnap
+
+func (response UpdateDermsnapById200JSONResponse) VisitUpdateDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(200)
+
+	return ctx.JSON(&response)
+}
+
+type UpdateDermsnapById401JSONResponse Error
+
+func (response UpdateDermsnapById401JSONResponse) VisitUpdateDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type UpdateDermsnapById500JSONResponse Error
+
+func (response UpdateDermsnapById500JSONResponse) VisitUpdateDermsnapByIdResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(500)
+
+	return ctx.JSON(&response)
+}
+
+type UploadDermsnapImageRequestObject struct {
+	DermsnapId DermsnapId `json:"dermsnap_id"`
+}
+
+type UploadDermsnapImageResponseObject interface {
+	VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error
+}
+
+type UploadDermsnapImage200JSONResponse DermsnapImage
+
+func (response UploadDermsnapImage200JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(200)
+
+	return ctx.JSON(&response)
+}
+
+type UploadDermsnapImage401JSONResponse Error
+
+func (response UploadDermsnapImage401JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type UploadDermsnapImage500JSONResponse Error
+
+func (response UploadDermsnapImage500JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(500)
+
+	return ctx.JSON(&response)
 }
 
 type MeRequestObject struct {
@@ -377,6 +733,24 @@ func (response CreateUserInfo500JSONResponse) VisitCreateUserInfoResponse(ctx *f
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Get dermsnaps
+	// (GET /dermsnaps)
+	GetDermsnaps(ctx context.Context, request GetDermsnapsRequestObject) (GetDermsnapsResponseObject, error)
+	// Create dermsnap
+	// (POST /dermsnaps)
+	CreateDermsnap(ctx context.Context, request CreateDermsnapRequestObject) (CreateDermsnapResponseObject, error)
+	// Delete dermsnap
+	// (DELETE /dermsnaps/{dermsnap_id})
+	DeleteDermsnapById(ctx context.Context, request DeleteDermsnapByIdRequestObject) (DeleteDermsnapByIdResponseObject, error)
+	// Get dermsnap
+	// (GET /dermsnaps/{dermsnap_id})
+	GetDermsnapById(ctx context.Context, request GetDermsnapByIdRequestObject) (GetDermsnapByIdResponseObject, error)
+	// Update dermsnap
+	// (PUT /dermsnaps/{dermsnap_id})
+	UpdateDermsnapById(ctx context.Context, request UpdateDermsnapByIdRequestObject) (UpdateDermsnapByIdResponseObject, error)
+	// Upload dermsnap image
+	// (POST /dermsnaps/{dermsnap_id}/images)
+	UploadDermsnapImage(ctx context.Context, request UploadDermsnapImageRequestObject) (UploadDermsnapImageResponseObject, error)
 	// Get current user
 	// (GET /me)
 	Me(ctx context.Context, request MeRequestObject) (MeResponseObject, error)
@@ -405,6 +779,182 @@ func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareF
 type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
+}
+
+// GetDermsnaps operation middleware
+func (sh *strictHandler) GetDermsnaps(ctx *fiber.Ctx) error {
+	var request GetDermsnapsRequestObject
+
+	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
+		return sh.ssi.GetDermsnaps(ctx.UserContext(), request.(GetDermsnapsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetDermsnaps")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	} else if validResponse, ok := response.(GetDermsnapsResponseObject); ok {
+		if err := validResponse.VisitGetDermsnapsResponse(ctx); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// CreateDermsnap operation middleware
+func (sh *strictHandler) CreateDermsnap(ctx *fiber.Ctx) error {
+	var request CreateDermsnapRequestObject
+
+	var body CreateDermsnapJSONRequestBody
+	if err := ctx.BodyParser(&body); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	request.Body = &body
+
+	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateDermsnap(ctx.UserContext(), request.(CreateDermsnapRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateDermsnap")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	} else if validResponse, ok := response.(CreateDermsnapResponseObject); ok {
+		if err := validResponse.VisitCreateDermsnapResponse(ctx); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// DeleteDermsnapById operation middleware
+func (sh *strictHandler) DeleteDermsnapById(ctx *fiber.Ctx, dermsnapId DermsnapId) error {
+	var request DeleteDermsnapByIdRequestObject
+
+	request.DermsnapId = dermsnapId
+
+	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteDermsnapById(ctx.UserContext(), request.(DeleteDermsnapByIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteDermsnapById")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	} else if validResponse, ok := response.(DeleteDermsnapByIdResponseObject); ok {
+		if err := validResponse.VisitDeleteDermsnapByIdResponse(ctx); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// GetDermsnapById operation middleware
+func (sh *strictHandler) GetDermsnapById(ctx *fiber.Ctx, dermsnapId DermsnapId) error {
+	var request GetDermsnapByIdRequestObject
+
+	request.DermsnapId = dermsnapId
+
+	var body GetDermsnapByIdJSONRequestBody
+	if err := ctx.BodyParser(&body); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	request.Body = &body
+
+	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
+		return sh.ssi.GetDermsnapById(ctx.UserContext(), request.(GetDermsnapByIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetDermsnapById")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	} else if validResponse, ok := response.(GetDermsnapByIdResponseObject); ok {
+		if err := validResponse.VisitGetDermsnapByIdResponse(ctx); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// UpdateDermsnapById operation middleware
+func (sh *strictHandler) UpdateDermsnapById(ctx *fiber.Ctx, dermsnapId DermsnapId) error {
+	var request UpdateDermsnapByIdRequestObject
+
+	request.DermsnapId = dermsnapId
+
+	var body UpdateDermsnapByIdJSONRequestBody
+	if err := ctx.BodyParser(&body); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	request.Body = &body
+
+	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateDermsnapById(ctx.UserContext(), request.(UpdateDermsnapByIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateDermsnapById")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	} else if validResponse, ok := response.(UpdateDermsnapByIdResponseObject); ok {
+		if err := validResponse.VisitUpdateDermsnapByIdResponse(ctx); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// UploadDermsnapImage operation middleware
+func (sh *strictHandler) UploadDermsnapImage(ctx *fiber.Ctx, dermsnapId DermsnapId) error {
+	var request UploadDermsnapImageRequestObject
+
+	request.DermsnapId = dermsnapId
+
+	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
+		return sh.ssi.UploadDermsnapImage(ctx.UserContext(), request.(UploadDermsnapImageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UploadDermsnapImage")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	} else if validResponse, ok := response.(UploadDermsnapImageResponseObject); ok {
+		if err := validResponse.VisitUploadDermsnapImageResponse(ctx); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
 }
 
 // Me operation middleware
@@ -555,21 +1105,30 @@ func (sh *strictHandler) CreateUserInfo(ctx *fiber.Ctx, userId UserId) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"AAD//76p6HGGKQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

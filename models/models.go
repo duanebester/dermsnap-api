@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -25,6 +27,8 @@ type User struct {
 	Role           Role           `json:"role"`
 	Identifier     string         `json:"identifier" gorm:"uniqueIndex:idx_identifier_type;not null;"`
 	IdentifierType IdentifierType `json:"identifier_type" gorm:"uniqueIndex:idx_identifier_type;not null;"`
+	CreatedAt      time.Time      `json:"created_at"`
+	UpdatedAt      time.Time      `json:"updated_at"`
 }
 
 func NewUser(identifier string, role Role, idType IdentifierType) User {
@@ -81,5 +85,86 @@ func NewDoctorInfo(userID uuid.UUID, specialty, credentials string) DoctorInfo {
 		UserID:      userID,
 		Specialty:   specialty,
 		Credentials: credentials,
+	}
+}
+
+type BodyLocation string
+
+const (
+	Scalp    BodyLocation = "scalp"
+	Face     BodyLocation = "face" // (not including eyes or mouth)
+	Eyes     BodyLocation = "eyes"
+	Mouth    BodyLocation = "mouth"
+	Neck     BodyLocation = "neck"
+	Chest    BodyLocation = "chest"
+	Abdomen  BodyLocation = "abdomen"
+	Back     BodyLocation = "back"
+	Arms     BodyLocation = "arms"
+	Hands    BodyLocation = "hands"
+	Buttocks BodyLocation = "buttocks"
+	Genitals BodyLocation = "genitals"
+	Legs     BodyLocation = "legs"
+	Feet     BodyLocation = "feet"
+)
+
+type CreateDermsnap struct {
+	StartTime      time.Time      `json:"start_time"`
+	Duration       int            `json:"duration"`
+	Locations      []BodyLocation `json:"locations"`
+	Changed        bool           `json:"changed"`
+	NewMedications []string       `json:"new_medications"`
+	Itchy          bool           `json:"itchy"`
+	Painful        bool           `json:"painful"`
+	MoreInfo       string         `json:"more_info"`
+}
+
+type UpdateDermsnap struct {
+	StartTime      time.Time      `json:"start_time"`
+	Duration       int            `json:"duration"`
+	Locations      []BodyLocation `json:"locations"`
+	Changed        bool           `json:"changed"`
+	NewMedications []string       `json:"new_medications"`
+	Itchy          bool           `json:"itchy"`
+	Painful        bool           `json:"painful"`
+	MoreInfo       string         `json:"more_info"`
+}
+
+type DermsnapImage struct {
+	ID         uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
+	DermsnapID uuid.UUID `json:"dermsnap_id" gorm:"type:uuid"`
+	ImagePath  string    `json:"image_path"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+type Dermsnap struct {
+	ID             uuid.UUID       `json:"id" gorm:"type:uuid;primary_key;"`
+	UserID         uuid.UUID       `json:"user_id" gorm:"type:uuid;foreignkey:UserID;references:ID"`
+	Reviewed       bool            `json:"reviewed" gorm:"default:false"`
+	ReviewedBy     uuid.UUID       `json:"reviewed_by" gorm:"type:uuid"`
+	StartTime      time.Time       `json:"start_time"`
+	Duration       int             `json:"duration"`
+	Locations      []BodyLocation  `json:"locations"`
+	Changed        bool            `json:"changed"`
+	NewMedications []string        `json:"new_medications"`
+	Itchy          bool            `json:"itchy"`
+	Painful        bool            `json:"painful"`
+	MoreInfo       string          `json:"more_info"`
+	Images         []DermsnapImage `json:"images" gorm:"foreignKey:DermsnapID;references:ID"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+}
+
+func NewDermsnap(userID uuid.UUID, opts CreateDermsnap) Dermsnap {
+	return Dermsnap{
+		ID:             uuid.New(),
+		UserID:         userID,
+		StartTime:      opts.StartTime,
+		Duration:       opts.Duration,
+		Locations:      opts.Locations,
+		Changed:        opts.Changed,
+		NewMedications: opts.NewMedications,
+		Itchy:          opts.Itchy,
+		Painful:        opts.Painful,
+		MoreInfo:       opts.MoreInfo,
 	}
 }

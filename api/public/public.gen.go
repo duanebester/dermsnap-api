@@ -19,7 +19,7 @@ import (
 
 // Error defines model for Error.
 type Error struct {
-	Message string `json:"message,omitempty"`
+	Message string `json:"message"`
 }
 
 // Login defines model for Login.
@@ -179,14 +179,14 @@ func (sh *strictHandler) Login(ctx *fiber.Ctx) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/7yTUW/UMAzHv8rJ8JiuHYOXvG0SSAdITBuIB8RDrvWu2dI42O7gOPW7o6R3t4fxhO54",
-	"qps4/tn+21tYOcFrpz1YqNO4Cr4FAy0NiSJGFbBbkLbHwRXzLTNxNhJTQlaP5XhAEbfGbOomIVgQZR/X",
-	"YOBXtaYqH1by4FNFST1FF6pEPioyWOURp8nsH9LqHluFycBHWvv4nIWD8+HfSQaSE/lJ3J0g2xuURFHw",
-	"edZKDxiPSZwMCLYje93cZn1mzAodI1+OWc/93zviwSlYeP/1M5hZzRxpvoVD5F41wZQD+3hHJVevId9c",
-	"Xi/BwCOyeIpg4fysOWty0ZQwuuTBwkU5ys3VvmRSh4N8JJq/uR0uV7fswO7UNcD4Y0TRK+o22amlqBiL",
-	"v0sp+La8qO+F4tMoZusl4x1YeFE/zWq9G9R6jj2VWngnSUnqVdMcF3IQvLA6lJZ9URAsfPqQW/T6iMh5",
-	"+/6CunLd4mZu5Mw8Pz3zS3Sj9sT+N3YZ+uZ/FLrMOxFdWNwiPyIv9o4GZBwGx5vDZE3zhmQvAfttCyOH",
-	"3ZDbug7UutCTqL1omgam79OfAAAA//8hUwdUCgUAAA==",
+	"H4sIAAAAAAAC/7xTwW4TMRD9lWrguOluKVx8ayWQAkhULYhD1YOzO8263fWYmdlCiPzvyHayPQQuKHDK",
+	"xH773njemy2srOCV1R4M1GFaDa6FCloaA3n0KmC2IG2Po83lW2biVASmgKwO8/GIInaNqdRNQDAgys6v",
+	"IcYKGL9NjrEDczsD76o9kFYP2CrECj7S2vlDbhytGw6ZK/ixWNMiHS7k0YUFBXXk7bAI5Lwig1GeMFYQ",
+	"rMh34u7vOeKfur1GCeQFD7tWekR/TMVYgWA7sdPNTfKjyKzQMvLFlPzb/3tHPFoFA++/foaquJeYyi3M",
+	"zL1qgJiInb+n3KvTId1cXC2hgidkceTBwNlpc9qkR1NAb4MDA+f5KA1X+9xJPcz2kWj6TeOw6XXLDszO",
+	"3ZIGFL2kbpNALXlFn/E2hMG1+Yv6Qcg/Ry9VLxnvwcCL+jmb9S6YdeGOsaStWJKbetU0xxWZDc9aHUrL",
+	"LjsIBj59SCN6fUTJsm2/kbq03cl1GWTRPPv3ml+8nbQndj+xS6Jv/sdDl2knvB1ObpCfkE/2wApkGkfL",
+	"mzlZsWxIQgmY2y1MPOxCbup6oNYOPYma86ZpIN7FXwEAAP//PFY//PoEAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
