@@ -11,7 +11,7 @@ import (
 var _ = Describe("UserService", func() {
 	Describe("CreateUser", func() {
 		It("should create a user", func() {
-			user, err := Services.UserService.CreateUser("user1", models.Admin, models.Google)
+			user, err := UserService.CreateUser("user1", models.Admin, models.Google)
 			Expect(err).To(BeNil())
 			Expect(user).ToNot(BeNil())
 			Expect(user.ID).ToNot(BeNil())
@@ -19,7 +19,7 @@ var _ = Describe("UserService", func() {
 		})
 
 		It("should not create a user with the same identifier", func() {
-			user, err := Services.UserService.CreateUser("user1", models.Admin, models.Google)
+			user, err := UserService.CreateUser("user1", models.Admin, models.Google)
 			Expect(err).ToNot(BeNil())
 			Expect(user).To(BeNil())
 		})
@@ -27,14 +27,14 @@ var _ = Describe("UserService", func() {
 
 	Describe("GetUserByIdentifier", func() {
 		BeforeEach(func() {
-			user, err := Services.UserService.CreateUser("user2", models.Admin, models.Google)
+			user, err := UserService.CreateUser("user2", models.Admin, models.Google)
 			Expect(err).To(BeNil())
 			Expect(user).ToNot(BeNil())
 			Expect(user.ID).ToNot(BeNil())
 			Expect(user.Identifier).To(Equal("user2"))
 		})
 		It("should get a user by identifier", func() {
-			found, err := Services.UserService.GetUserByIdentifier("user2", models.Google)
+			found, err := UserService.GetUserByIdentifier("user2", models.Google)
 			Expect(err).To(BeNil())
 			Expect(found).ToNot(BeNil())
 			Expect(found.ID).ToNot(BeNil())
@@ -45,7 +45,7 @@ var _ = Describe("UserService", func() {
 	Describe("GetUserById", func() {
 		var userID string
 		BeforeEach(func() {
-			user, err := Services.UserService.CreateUser("user3", models.Admin, models.Google)
+			user, err := UserService.CreateUser("user3", models.Admin, models.Google)
 			userID = user.ID.String()
 			Expect(err).To(BeNil())
 			Expect(user).ToNot(BeNil())
@@ -53,7 +53,7 @@ var _ = Describe("UserService", func() {
 			Expect(user.Identifier).To(Equal("user3"))
 		})
 		It("should get a user by id", func() {
-			found, err := Services.UserService.GetUserByID(userID)
+			found, err := UserService.GetUserByID(userID)
 			Expect(err).To(BeNil())
 			Expect(found).ToNot(BeNil())
 			Expect(found.ID).ToNot(BeNil())
@@ -64,7 +64,7 @@ var _ = Describe("UserService", func() {
 	Describe("CreateDoctorInfo", func() {
 		var doctorId uuid.UUID
 		BeforeEach(func() {
-			user, err := Services.UserService.CreateUser("doctor1", models.Doctor, models.Doximity)
+			user, err := UserService.CreateUser("doctor1", models.Doctor, models.Doximity)
 			doctorId = user.ID
 			Expect(err).To(BeNil())
 			Expect(user).ToNot(BeNil())
@@ -73,7 +73,7 @@ var _ = Describe("UserService", func() {
 		})
 
 		It("should create a doctor info", func() {
-			doctorInfo, err := Services.UserService.CreateDoctorInfo(doctorId, models.CreateDoctorInfo{
+			doctorInfo, err := UserService.CreateDoctorInfo(doctorId, models.CreateDoctorInfo{
 				Specialty:   "Dermatology",
 				Credentials: "MD",
 			})
@@ -88,7 +88,7 @@ var _ = Describe("UserService", func() {
 	Describe("CreateUserInfo", Ordered, func() {
 		var userId uuid.UUID
 		BeforeAll(func() {
-			user, err := Services.UserService.CreateUser("user4", models.Doctor, models.Doximity)
+			user, err := UserService.CreateUser("user4", models.Doctor, models.Doximity)
 			userId = user.ID
 			Expect(err).To(BeNil())
 			Expect(user).ToNot(BeNil())
@@ -97,7 +97,7 @@ var _ = Describe("UserService", func() {
 		})
 
 		It("should create a user info", func() {
-			userInfo, err := Services.UserService.CreateUserInfo(userId, models.CreateUserInfo{
+			userInfo, err := UserService.CreateUserInfo(userId, models.CreateUserInfo{
 				Height: 180,
 				Weight: 80,
 				Age:    30,
@@ -111,7 +111,7 @@ var _ = Describe("UserService", func() {
 		})
 
 		It("should get user info", func() {
-			userInfo, err := Services.UserService.GetUserInfo(userId)
+			userInfo, err := UserService.GetUserInfo(userId)
 			Expect(err).To(BeNil())
 			Expect(userInfo).ToNot(BeNil())
 			Expect(userInfo.ID).ToNot(BeNil())

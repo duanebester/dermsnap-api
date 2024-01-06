@@ -17,13 +17,11 @@ type DermsnapService interface {
 }
 
 type DermsnapServiceImpl struct {
-	userRepo     repository.UserRepository
 	dermsnapRepo repository.DermsnapRepository
 }
 
 func NewDermsnapService(db *gorm.DB) DermsnapService {
 	return DermsnapServiceImpl{
-		userRepo:     repository.NewUserRepository(db),
 		dermsnapRepo: repository.NewDermsnapRepository(db),
 	}
 }

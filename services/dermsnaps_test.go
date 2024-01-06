@@ -8,21 +8,24 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DermsnapService", func() {
-	var user *models.User
+var _ = Describe("DermsnapService", Ordered, func() {
+	var dermsnapUser *models.User
 	BeforeAll(func() {
-		user, err := Services.UserService.CreateUser("dermsnapUser1", models.Admin, models.Google)
-		Expect(err).To(BeNil())
-		Expect(user.Identifier).To(Equal("dermsnapUser1"))
+		dermsnapUser, _ = UserService.CreateUser("dermsnapUser1", models.Admin, models.Google)
+		Expect(dermsnapUser).ToNot(BeNil())
+		Expect(dermsnapUser.Identifier).To(Equal("dermsnapUser1"))
 	})
 	Describe("CreateDermsnap", func() {
 		It("should create a dermsnap", func() {
-			dermsnap, err := Services.DermsnapService.CreateDermsnap(user.ID, models.CreateDermsnap{
-				StartTime:      time.Now().AddDate(0, 0, -10),
-				Duration:       10,
-				Locations:      []models.BodyLocation{"arms"},
+			dermsnap, err := DermsnapService.CreateDermsnap(dermsnapUser.ID, models.CreateDermsnap{
+				StartTime: time.Now().AddDate(0, 0, -10),
+				Duration:  10,
+				Locations: []models.BodyLocation{
+					models.Arms,
+					models.Abdomen,
+				},
 				Changed:        false,
-				NewMedications: []string{},
+				NewMedications: []string{"finasteride"},
 				Itchy:          true,
 				Painful:        false,
 				MoreInfo:       "",
@@ -35,10 +38,12 @@ var _ = Describe("DermsnapService", func() {
 
 	Describe("Get User Dermsnaps", func() {
 		BeforeAll(func() {
-			_, err := Services.DermsnapService.CreateDermsnap(user.ID, models.CreateDermsnap{
-				StartTime:      time.Now().AddDate(0, 0, -10),
-				Duration:       10,
-				Locations:      []models.BodyLocation{"arms"},
+			_, err := DermsnapService.CreateDermsnap(dermsnapUser.ID, models.CreateDermsnap{
+				StartTime: time.Now().AddDate(0, 0, -10),
+				Duration:  10,
+				Locations: []models.BodyLocation{
+					models.Arms,
+				},
 				Changed:        false,
 				NewMedications: []string{},
 				Itchy:          true,
@@ -46,10 +51,12 @@ var _ = Describe("DermsnapService", func() {
 				MoreInfo:       "",
 			})
 			Expect(err).To(BeNil())
-			_, err = Services.DermsnapService.CreateDermsnap(user.ID, models.CreateDermsnap{
-				StartTime:      time.Now().AddDate(0, 0, -10),
-				Duration:       10,
-				Locations:      []models.BodyLocation{"arms"},
+			_, err = DermsnapService.CreateDermsnap(dermsnapUser.ID, models.CreateDermsnap{
+				StartTime: time.Now().AddDate(0, 0, -10),
+				Duration:  10,
+				Locations: []models.BodyLocation{
+					models.Arms,
+				},
 				Changed:        false,
 				NewMedications: []string{},
 				Itchy:          true,
@@ -59,9 +66,9 @@ var _ = Describe("DermsnapService", func() {
 			Expect(err).To(BeNil())
 		})
 		It("should get dermsnaps for a user by user id", func() {
-			dermsnaps, err := Services.DermsnapService.GetUserDermsnaps(user.ID)
+			dermsnaps, err := DermsnapService.GetUserDermsnaps(dermsnapUser.ID)
 			Expect(err).To(BeNil())
-			Expect(len(dermsnaps)).To(Equal(2))
+			Expect(len(dermsnaps)).To(Equal(3))
 			Expect(dermsnaps[len(dermsnaps)-1].Itchy).To(Equal(true))
 		})
 	})

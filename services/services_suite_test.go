@@ -17,7 +17,8 @@ import (
 )
 
 var DB *gorm.DB
-var Services services.Services
+var UserService services.UserService
+var DermsnapService services.DermsnapService
 
 func TestServices(t *testing.T) {
 	ctx := context.Background()
@@ -47,7 +48,8 @@ func TestServices(t *testing.T) {
 	os.Setenv("DATABASE_URL", connStr)
 
 	DB = database.NewDatabase()
-	Services = *services.NewServices(DB)
+	UserService = services.NewUserService(DB)
+	DermsnapService = services.NewDermsnapService(DB)
 
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Services Suite Test")

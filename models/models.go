@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type IdentifierType string
@@ -138,29 +139,33 @@ type DermsnapImage struct {
 
 type Dermsnap struct {
 	ID             uuid.UUID       `json:"id" gorm:"type:uuid;primary_key;"`
-	UserID         uuid.UUID       `json:"user_id" gorm:"type:uuid;foreignkey:UserID;references:ID"`
+	UserID         uuid.UUID       `json:"user_id" gorm:"type:uuid;"`
 	Reviewed       bool            `json:"reviewed" gorm:"default:false"`
-	ReviewedBy     uuid.UUID       `json:"reviewed_by" gorm:"type:uuid"`
+	ReviewedBy     uuid.UUID       `json:"reviewed_by,omitempty" gorm:"type:uuid;default:null;"`
 	StartTime      time.Time       `json:"start_time"`
 	Duration       int             `json:"duration"`
-	Locations      []BodyLocation  `json:"locations"`
+	Locations      pq.StringArray  `json:"locations" gorm:"type:varchar(64)[]"`
 	Changed        bool            `json:"changed"`
-	NewMedications []string        `json:"new_medications"`
+	NewMedications pq.StringArray  `json:"new_medications" gorm:"type:varchar(255)[];"`
 	Itchy          bool            `json:"itchy"`
 	Painful        bool            `json:"painful"`
 	MoreInfo       string          `json:"more_info"`
-	Images         []DermsnapImage `json:"images" gorm:"foreignKey:DermsnapID;references:ID"`
+	Images         []DermsnapImage `json:"images"`
 	CreatedAt      time.Time       `json:"created_at"`
 	UpdatedAt      time.Time       `json:"updated_at"`
 }
 
 func NewDermsnap(userID uuid.UUID, opts CreateDermsnap) Dermsnap {
+	locations := make([]string, len(opts.Locations))
+	for i, location := range opts.Locations {
+		locations[i] = string(location)
+	}
 	return Dermsnap{
 		ID:             uuid.New(),
 		UserID:         userID,
 		StartTime:      opts.StartTime,
 		Duration:       opts.Duration,
-		Locations:      opts.Locations,
+		Locations:      locations,
 		Changed:        opts.Changed,
 		NewMedications: opts.NewMedications,
 		Itchy:          opts.Itchy,
