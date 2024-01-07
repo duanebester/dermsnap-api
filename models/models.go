@@ -120,14 +120,14 @@ type CreateDermsnap struct {
 }
 
 type UpdateDermsnap struct {
-	StartTime      time.Time      `json:"start_time"`
-	Duration       int            `json:"duration"`
-	Locations      []BodyLocation `json:"locations"`
-	Changed        bool           `json:"changed"`
-	NewMedications []string       `json:"new_medications"`
-	Itchy          bool           `json:"itchy"`
-	Painful        bool           `json:"painful"`
-	MoreInfo       string         `json:"more_info"`
+	StartTime      *time.Time     `json:"start_time,omitempty"`
+	Duration       int            `json:"duration,omitempty"`
+	Locations      []BodyLocation `json:"locations,omitempty"`
+	Changed        *bool          `json:"changed,omitempty"`
+	NewMedications []string       `json:"new_medications,omitempty"`
+	Itchy          *bool          `json:"itchy,omitempty"`
+	Painful        *bool          `json:"painful,omitempty"`
+	MoreInfo       string         `json:"more_info,omitempty"`
 }
 
 type DermsnapImage struct {
@@ -144,9 +144,9 @@ type Dermsnap struct {
 	ReviewedBy     uuid.UUID       `json:"reviewed_by,omitempty" gorm:"type:uuid;default:null;"`
 	StartTime      time.Time       `json:"start_time"`
 	Duration       int             `json:"duration"`
-	Locations      pq.StringArray  `json:"locations" gorm:"type:varchar(64)[]"`
+	Locations      pq.StringArray  `json:"locations" gorm:"type:text[]"`
 	Changed        bool            `json:"changed"`
-	NewMedications pq.StringArray  `json:"new_medications" gorm:"type:varchar(255)[];"`
+	NewMedications pq.StringArray  `json:"new_medications" gorm:"type:text[];"`
 	Itchy          bool            `json:"itchy"`
 	Painful        bool            `json:"painful"`
 	MoreInfo       string          `json:"more_info"`

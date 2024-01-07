@@ -11,7 +11,7 @@ type DermsnapRepository interface {
 	CreateDermsnap(userID uuid.UUID, opts models.CreateDermsnap) (*models.Dermsnap, error)
 	GetUserDermsnaps(userID uuid.UUID) ([]models.Dermsnap, error)
 	GetDermsnapById(id uuid.UUID) (*models.Dermsnap, error)
-	UpdateDermsnap(id uuid.UUID, opts models.UpdateDermsnap) (*models.Dermsnap, error)
+	UpdateDermsnap(id uuid.UUID, opts *models.Dermsnap) (*models.Dermsnap, error)
 	DeleteDermsnap(dermsnap *models.Dermsnap) (*models.Dermsnap, error)
 }
 
@@ -43,8 +43,8 @@ func (d DermsnapRepositoryImpl) GetDermsnapById(id uuid.UUID) (*models.Dermsnap,
 	return &dermsnap, nil
 }
 
-func (d DermsnapRepositoryImpl) UpdateDermsnap(id uuid.UUID, opts models.UpdateDermsnap) (*models.Dermsnap, error) {
-	err := d.db.Where("id = ?", id).Updates(&opts).Error
+func (d DermsnapRepositoryImpl) UpdateDermsnap(id uuid.UUID, opts *models.Dermsnap) (*models.Dermsnap, error) {
+	err := d.db.Where("id = ?", id).Select("start_time", "duration", "locations", "changed", "new_medications", "itchy", "painful", "more_info").Updates(opts).Error
 	if err != nil {
 		return nil, err
 	}

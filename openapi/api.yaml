@@ -180,6 +180,18 @@ paths:
       operationId: "upload-dermsnap-image"
       security:
         - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                dermsnap_id:
+                  type: string
+                  format: uuid
+                file:
+                  type: string
+                  format: binary
       responses:
         "200":
           description: "OK"

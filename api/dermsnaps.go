@@ -62,7 +62,35 @@ func (a API) UpdateDermsnapById(ctx context.Context, request http.UpdateDermsnap
 		}, nil
 	}
 
-	_, err = a.services.DermsnapService.UpdateDermsnap(dermsnap.ID, *request.Body)
+	if request.Body.StartTime != nil {
+		dermsnap.StartTime = *request.Body.StartTime
+	}
+	if request.Body.Duration != 0 {
+		dermsnap.Duration = request.Body.Duration
+	}
+	if request.Body.Locations != nil {
+		dermsnap.Locations = make([]string, len(request.Body.Locations))
+		for i, location := range request.Body.Locations {
+			dermsnap.Locations[i] = string(location)
+		}
+	}
+	if request.Body.Changed != nil {
+		dermsnap.Changed = *request.Body.Changed
+	}
+	if request.Body.NewMedications != nil {
+		dermsnap.NewMedications = request.Body.NewMedications
+	}
+	if request.Body.Itchy != nil {
+		dermsnap.Itchy = *request.Body.Itchy
+	}
+	if request.Body.Painful != nil {
+		dermsnap.Painful = *request.Body.Painful
+	}
+	if request.Body.MoreInfo != "" {
+		dermsnap.MoreInfo = request.Body.MoreInfo
+	}
+
+	_, err = a.services.DermsnapService.UpdateDermsnap(dermsnap.ID, dermsnap)
 	if err != nil {
 		return http.UpdateDermsnapById500JSONResponse{
 			Message: err.Error(),
