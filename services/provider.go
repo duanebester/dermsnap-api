@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -40,7 +39,7 @@ func CreateAppleProvider(ctx context.Context) (oauth2.Config, *oidc.IDTokenVerif
 	providerBaseUrl := os.Getenv("APPLE_PROVIDER_BASE_URL")
 	provider, err := oidc.NewProvider(ctx, providerBaseUrl)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	oidcConfig := &oidc.Config{ClientID: clientID}
 	verifier := provider.Verifier(oidcConfig)
@@ -74,7 +73,7 @@ func CreateDoximityProvider(ctx context.Context) (oauth2.Config, *oidc.IDTokenVe
 	providerBaseUrl := os.Getenv("DOXIMITY_PROVIDER_BASE_URL")
 	provider, err := oidc.NewProvider(ctx, providerBaseUrl)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	oidcConfig := &oidc.Config{ClientID: clientID}
 	verifier := provider.Verifier(oidcConfig)
@@ -105,7 +104,7 @@ func CreateGoogleProvider(ctx context.Context) (oauth2.Config, *oidc.IDTokenVeri
 	providerBaseUrl := os.Getenv("GOOGLE_PROVIDER_BASE_URL")
 	provider, err := oidc.NewProvider(ctx, providerBaseUrl)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	oidcConfig := &oidc.Config{ClientID: clientID}
 	verifier := provider.Verifier(oidcConfig)

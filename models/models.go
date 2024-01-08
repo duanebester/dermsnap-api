@@ -133,7 +133,9 @@ type UpdateDermsnap struct {
 type DermsnapImage struct {
 	ID         uuid.UUID `json:"id" gorm:"type:uuid;primary_key;"`
 	DermsnapID uuid.UUID `json:"dermsnap_id" gorm:"type:uuid"`
-	ImagePath  string    `json:"image_path"`
+	Url        string    `json:"url"`
+	FileName   string    `json:"file_name"`
+	FileKey    string    `json:"file_key"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 

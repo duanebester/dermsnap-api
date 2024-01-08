@@ -10,6 +10,7 @@ import (
 
 type DermsnapService interface {
 	CreateDermsnap(userID uuid.UUID, opts models.CreateDermsnap) (*models.Dermsnap, error)
+	CreateDermsnapImage(dermsnapID uuid.UUID, dermsnapImage *models.DermsnapImage) (*models.DermsnapImage, error)
 	GetUserDermsnaps(userID uuid.UUID) ([]models.Dermsnap, error)
 	GetDermsnapById(id uuid.UUID) (*models.Dermsnap, error)
 	UpdateDermsnap(id uuid.UUID, dermsnap *models.Dermsnap) (*models.Dermsnap, error)
@@ -44,4 +45,8 @@ func (d DermsnapServiceImpl) UpdateDermsnap(id uuid.UUID, opts *models.Dermsnap)
 
 func (d DermsnapServiceImpl) DeleteDermsnap(dermsnap *models.Dermsnap) (*models.Dermsnap, error) {
 	return d.dermsnapRepo.DeleteDermsnap(dermsnap)
+}
+
+func (d DermsnapServiceImpl) CreateDermsnapImage(dermsnapID uuid.UUID, dermsnapImage *models.DermsnapImage) (*models.DermsnapImage, error) {
+	return d.dermsnapRepo.CreateDermsnapImage(dermsnapID, dermsnapImage)
 }

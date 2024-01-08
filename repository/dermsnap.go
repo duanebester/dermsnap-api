@@ -9,6 +9,7 @@ import (
 
 type DermsnapRepository interface {
 	CreateDermsnap(userID uuid.UUID, opts models.CreateDermsnap) (*models.Dermsnap, error)
+	CreateDermsnapImage(dermsnapID uuid.UUID, dermsnapImage *models.DermsnapImage) (*models.DermsnapImage, error)
 	GetUserDermsnaps(userID uuid.UUID) ([]models.Dermsnap, error)
 	GetDermsnapById(id uuid.UUID) (*models.Dermsnap, error)
 	UpdateDermsnap(id uuid.UUID, opts *models.Dermsnap) (*models.Dermsnap, error)
@@ -66,4 +67,12 @@ func (d DermsnapRepositoryImpl) DeleteDermsnap(dermsnap *models.Dermsnap) (*mode
 		return nil, err
 	}
 	return dermsnap, nil
+}
+
+func (d DermsnapRepositoryImpl) CreateDermsnapImage(dermsnapID uuid.UUID, dermsnapImage *models.DermsnapImage) (*models.DermsnapImage, error) {
+	err := d.db.Create(&dermsnapImage).Error
+	if err != nil {
+		return nil, err
+	}
+	return dermsnapImage, nil
 }

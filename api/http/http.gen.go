@@ -75,15 +75,11 @@ type UserId = openapi_types.UUID
 
 // UploadDermsnapImageMultipartBody defines parameters for UploadDermsnapImage.
 type UploadDermsnapImageMultipartBody struct {
-	DermsnapId *openapi_types.UUID `json:"dermsnap_id,omitempty"`
-	File       *openapi_types.File `json:"file,omitempty"`
+	File *openapi_types.File `json:"file,omitempty"`
 }
 
 // CreateDermsnapJSONRequestBody defines body for CreateDermsnap for application/json ContentType.
 type CreateDermsnapJSONRequestBody = CreateDermsnap
-
-// GetDermsnapByIdJSONRequestBody defines body for GetDermsnapById for application/json ContentType.
-type GetDermsnapByIdJSONRequestBody = UpdateDermsnap
 
 // UpdateDermsnapByIdJSONRequestBody defines body for UpdateDermsnapById for application/json ContentType.
 type UpdateDermsnapByIdJSONRequestBody = UpdateDermsnap
@@ -460,7 +456,6 @@ func (response DeleteDermsnapById500JSONResponse) VisitDeleteDermsnapByIdRespons
 
 type GetDermsnapByIdRequestObject struct {
 	DermsnapId DermsnapId `json:"dermsnap_id"`
-	Body       *GetDermsnapByIdJSONRequestBody
 }
 
 type GetDermsnapByIdResponseObject interface {
@@ -548,11 +543,38 @@ func (response UploadDermsnapImage200JSONResponse) VisitUploadDermsnapImageRespo
 	return ctx.JSON(&response)
 }
 
+type UploadDermsnapImage400JSONResponse Error
+
+func (response UploadDermsnapImage400JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(400)
+
+	return ctx.JSON(&response)
+}
+
 type UploadDermsnapImage401JSONResponse Error
 
 func (response UploadDermsnapImage401JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
 	ctx.Response().Header.Set("Content-Type", "application/json")
 	ctx.Status(401)
+
+	return ctx.JSON(&response)
+}
+
+type UploadDermsnapImage413JSONResponse Error
+
+func (response UploadDermsnapImage413JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(413)
+
+	return ctx.JSON(&response)
+}
+
+type UploadDermsnapImage415JSONResponse Error
+
+func (response UploadDermsnapImage415JSONResponse) VisitUploadDermsnapImageResponse(ctx *fiber.Ctx) error {
+	ctx.Response().Header.Set("Content-Type", "application/json")
+	ctx.Status(415)
 
 	return ctx.JSON(&response)
 }
@@ -881,12 +903,6 @@ func (sh *strictHandler) GetDermsnapById(ctx *fiber.Ctx, dermsnapId DermsnapId) 
 
 	request.DermsnapId = dermsnapId
 
-	var body GetDermsnapByIdJSONRequestBody
-	if err := ctx.BodyParser(&body); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
-	}
-	request.Body = &body
-
 	handler := func(ctx *fiber.Ctx, request interface{}) (interface{}, error) {
 		return sh.ssi.GetDermsnapById(ctx.UserContext(), request.(GetDermsnapByIdRequestObject))
 	}
@@ -1118,30 +1134,31 @@ func (sh *strictHandler) CreateUserInfo(ctx *fiber.Ctx, userId UserId) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

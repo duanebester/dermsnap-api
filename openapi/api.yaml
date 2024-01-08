@@ -95,11 +95,6 @@ paths:
       operationId: "get-dermsnap-by-id"
       security:
         - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateDermsnap"
       responses:
         "200":
           description: "OK"
@@ -186,9 +181,6 @@ paths:
             schema:
               type: object
               properties:
-                dermsnap_id:
-                  type: string
-                  format: uuid
                 file:
                   type: string
                   format: binary
@@ -199,8 +191,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DermsnapImage"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "401":
           description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "413":
+          description: "Request Entity Too Large"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "415":
+          description: "Unsupported Media Type"
           content:
             application/json:
               schema:
@@ -484,7 +494,11 @@ components:
         dermsnap_id:
           type: string
           format: uuid
-        image_path:
+        url:
+          type: string
+        file_name:
+          type: string
+        file_key:
           type: string
         created_at:
           type: string
@@ -590,6 +604,14 @@ components:
     dermsnap_id:
       name: dermsnap_id
       description: The dermsnap ID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    image_id:
+      name: image_id
+      description: The image ID
       in: path
       required: true
       schema:
